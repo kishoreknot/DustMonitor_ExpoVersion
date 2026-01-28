@@ -1,0 +1,14 @@
+{
+  "network_address": 16,
+  "full_scale": 1000,
+  "alarm_threshold": 800,
+  "calibration": {
+    "offset": 0,
+    "scale": 1.0
+  },
+  "serial": {
+    "baudrate": 9600,
+    "parity": "N",
+    "bytesize": 8
+  }
+}

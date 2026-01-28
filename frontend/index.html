@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en" class = "light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GreenEnv Device Manager</title>
+    <!-- <link href="static/css/output.css" rel="stylesheet"> -->
+    <link rel="icon" type="image/png" href="static/images/favicon.png" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+        };
+    </script>
+    <script src="static/js/vendor/charts.min.js"></script>
+  </head>
+  <body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors">
+    <!-- <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-100 flex flex-col gap-3"></div> -->
+     <div id="toast-container" 
+        class="fixed top-[90px] left-1/2 -translate-x-1/2 z-[100] flex flex-col gap-3 w-full max-w-md items-center pointer-events-none">
+    </div>
+    <!-- <main class="pt-24 p-6 space-y-6"> -->
+        <section id="view-home" class="view-content">
+            
+            <header class="fixed top-0 h-20 left-0 right-0 z-50 flex items-center justify-between p-4 bg-gray/300 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 transition-all duration-300">
+            <!-- <header class="fixed top-0 left-0 z-50 h-20 right-0 p-4 bg-gray/300 flex items-center shadow-md"></header>     -->
+                <!-- <div class="flex-1 flex justify-start"> -->
+                <nav class="flex items-center justify-between w-full px-6">
+                <div class="flex-1 h-20 flex items-center">
+                    <!-- <img src="./static/images/GE_logo.png" alt="Logo" class="h-12 w-auto object-contain"> -->
+                     <img src="./static/images/GE_logo_new.png" 
+                        alt="Logo" 
+                        class="h-16 w-auto object-contain dark:brightness-10">
+                </div>
+                <!-- <div class="flex-1 flex justify-center">
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">
+                    DustMonitorUM
+                    </h1>
+                </div> -->
+                <div class="flex-1 flex justify-center">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                        
+                        <h1 class="relative flex items-center gap-2">
+                            <span class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-300 dark:to-white">
+                                DUST<span class="text-blue-600 dark:text-blue-400">MONITOR</span>
+                            </span>
+                                <!-- <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-widest uppercase bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded">
+                                    UM
+                                </span> -->
+                        </h1>
+                    </div>
+                </div>
+                <div class="flex-1 flex items-center justify-end gap-3">
+                    
+                    <button id="darkModeBtn" class="group flex items-center justify-center w-11 h-11 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full transition-all duration-300 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                        <svg class="w-5 h-5 block dark:hidden transition-transform duration-500 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        
+                        <svg class="w-5 h-5 hidden dark:block text-yellow-400 transition-transform duration-500 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 11H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                        </svg>
+                    </button>
+
+                    <button onclick="navigateTo('admin')" class="group relative inline-flex items-center gap-3 px-6 py-2.5 bg-white/80        dark:bg-slate-800/80 backdrop-blur-md text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ease-out hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 no-underline">
+    
+                        <span class="absolute inset-0 rounded-full bg-blue-400/0 group-hover:bg-blue-400/5 transition-colors duration-300"></span>
+
+                        <svg class="w-5 h-5 transition-transform duration-700 group-hover:rotate-90 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+
+                        <span class="relative z-10">Control Center</span>
+
+                        <svg class="w-4 h-4 transition-all duration-300 transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                        </svg>
+                    </button>
+
+                </div>
+            </nav>
+            </header>
+        <main class="pt-24 p-6 space-y-6">
+            <!-- Device Readings -->
+            <section class="rounded-xl p-6 shadow
+                bg-gradient-to-br from-slate-50 to-slate-100
+                dark:from-slate-800 dark:to-slate-700">
+                <div class="flex justify-between items-center mb-4 gap-1">
+                <h2 class="text-lg font-semibold">Device Readings</h2>
+
+                <!--   Stream Data Toggle -->
+                <div class="flex flex-col md:flex-row md:items-center gap-4">
+                    <div class="flex items-center gap-1">
+
+                        <button 
+                            id="connectBtn" 
+                            class="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-slate-800 rounded-lg group active:scale-95 border border-slate-700 hover:bg-slate-700 shadow-lg"
+                        >
+                            <span class="relative flex h-3 w-3 mr-3">
+                                <span id="statusDotPing" class="absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+                                <span id="statusDot" class="relative inline-flex rounded-full h-3 w-3 bg-slate-500"></span>
+                            </span>
+                            
+                            <span id="btnText" class="tracking-wider uppercase text-xs">Connect Device</span>
+                            
+                            <svg id="loadingSpinner" class="hidden animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                        
+
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                        Stream Data
+                        </span>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" class="sr-only peer" id="streamToggle">
+                        <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 dark:bg-gray-600 dark:peer-checked:bg-emerald-600">
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                            Every
+                        </span>
+
+                        <select
+                            id="secondsDropdown"
+                            disabled
+                            class="text-sm rounded-lg border border-gray-300 bg-white px-3 py-1.5
+                                text-gray-800 shadow-sm focus:border-emerald-500 focus:ring-2
+                                focus:ring-emerald-500 focus:outline-none
+                                dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                            <!--                  ${Array.from({length: 24}, (_, i) => `<option value="${i+2}">${i+2}</option>`).join('')}-->
+                            <!-- Options 2–25 seconds -->
+                            <option value="2">2</option>
+                            <option value="20">20</option>
+                            <option value="30">30</option>
+                            <option value="40">40</option>
+                            <option value="50">50</option>
+                            <option value="60">60</option>
+                            <!-- <option value="7">7</option>
+                            <option value="8">8</option>
+                            <option value="9">9</option>
+                            <option value="10">10</option>
+                            <option value="11">11</option>
+                            <option value="12">12</option>
+                            <option value="13">13</option>
+                            <option value="14">14</option>
+                            <option value="15">15</option>
+                            <option value="16">16</option>
+                            <option value="17">17</option>
+                            <option value="18">18</option>
+                            <option value="19">19</option>
+                            <option value="20">20</option>
+                            <option value="21">21</option>
+                            <option value="22">22</option>
+                            <option value="23">23</option>
+                            <option value="24">24</option>
+                            <option value="25">25</option> -->
+                        </select>
+
+                        <span class="text-sm text-gray-700 dark:text-gray-300">
+                            seconds
+                        </span>
+                    </div>
+                <!-- Read Sensor Data Button -->
+                    <div class="flex item-center gap-2">
+                        <button
+                            id="readDataBtn"
+                            class="px-5 py-2.5 rounded-lg text-sm font-semibold
+                            bg-emerald-500 text-white
+                            hover:bg-emerald-600
+                            active:bg-emerald-700
+                            focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2
+                            dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:active:bg-emerald-700
+                            disabled:bg-slate-400
+                            disabled:text-slate-200
+                            disabled:cursor-not-allowed
+                            disabled:hover:bg-slate-400
+                            disabled:active:bg-slate-400">
+                        Read Sensor Data
+                        </button>
+                        <button
+                            id = "stopBtn"
+                            class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600
+                                focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50">
+                        Stop
+                        </button>
+                    </div>
+                </div>
+                </div>
+                <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+
+                    <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                    rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                    hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                    <!-- Card Label -->
+                    <p class="text-sm font-semibold uppercase tracking-wider mb-1">Network Address</p>
+                    <!-- Card Value -->
+                    <p id="networkAddressValue" class="text-3xl font-bold mb-2">--</p>
+                    <!-- Optional Unit / Info -->
+                    <!--   <p class="text-sm opacity-80">Amperes</p>-->
+                    </div>
+
+                    <div id="dustConcDiv" class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                    rounded-xl shadow-lg transform transition-all transition-transform duration-300 hover:-translate-y-2
+                    hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                    <!-- Card Label -->
+                    <p class="text-xs font-semibold uppercase tracking-wider mb-1">Dust concentration</p>
+                    <!-- Card Value -->
+                    <p id="dustConcentrationValue" class="text-3xl font-bold mb-2">--</p>
+                    <!-- Optional Unit / Info -->
+                    <p class="text-sm opacity-80">Mg/Nm3</p>
+                    </div>
+
+                    <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                    rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                    hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                    <!-- Card Label -->
+                    <p class="text-sm font-semibold uppercase tracking-wider mb-1">PCB Temperature</p>
+                    <!-- Card Value -->
+                    <p id="pcbTempValue" class="text-3xl font-bold mb-2">--</p>
+                    <!-- Optional Unit / Info -->
+                    <p class="text-sm opacity-80">Celcius</p>
+                    </div>
+
+                    <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                    rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                    hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                    <!-- Card Label -->
+                    <p class="text-sm font-semibold uppercase tracking-wider mb-1">CURRENT LOOP</p>
+                    <!-- Card Value -->
+                    <p id="currentLoopValue" class="text-3xl font-bold mb-2">--</p>
+                    <!-- Optional Unit / Info -->
+                    <p class="text-sm opacity-80">(4-20mA)</p>
+                    </div>
+
+                    <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                    rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                    hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                    <!-- Card Label -->
+                    <p class="text-sm font-semibold uppercase tracking-wider mb-1">Laser Diode Signal</p>
+                    <!-- Card Value -->
+                    <p id="ldValue" class="text-3xl font-bold mb-2">--</p>
+                    <!-- Optional Unit / Info -->
+                    <p class="text-sm opacity-80">(mW)</p>
+                    </div>
+
+                    <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                    rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                    hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                    <!-- Card Label -->
+                    <p class="text-sm font-semibold uppercase tracking-wider mb-1">Photodiode Signal</p>
+                    <!-- Card Value -->
+                    <p id="pdValue" class="text-3xl font-bold mb-2">--</p>
+                    <!-- Optional Unit / Info -->
+                    <p class="text-sm opacity-80">(V)</p>
+                    </div>
+
+
+                </div>
+
+                <!-- <div id="myChart" style="width:100%; max-width:600px; height:500px;"></div> -->
+                <div class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 mt-6">
+                    <h3 class="text-lg font-bold mb-4 text-slate-800 dark:text-white">Dust Concentration Trend</h3>
+                    <div class="h-[300px]">
+                        <canvas id="historyChart"></canvas>
+                    </div>
+                </div>
+
+            
+            
+            </section>
+
+
+            
+            <!-- Device Info -->
+            <section class="rounded-xl p-6 shadow
+            bg-gradient-to-br from-white to-slate-50
+            dark:from-slate-800 dark:to-slate-700">
+                <h2 class="text-lg font-semibold mb-4">Device Info</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        Network Address
+                    </h1>
+                    <p
+                        id="networkAddressValue_info"
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div>
+                <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        Range
+                    </h1>
+                    <div class="flex items-baseline gap-1">
+                    <p 
+                        id="rangeValue_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                    <p>Mg/Nm3</p>
+                    </div>
+                </div>
+                <div id="alarm-threshold-alert" class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        Alarm Threshold
+                    </h1>
+                    <p 
+                        id="alarmThresholdValue_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>                 
+                </div>
+                <!-- Hiding below as per Client request -->
+                <!-- <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        Temp Auth Days
+                    </h1>
+                    <p 
+                        id="tempAuthDaysValue_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div> -->
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
+                <!-- <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        Smoothing Time (Sec)
+                    </h1>
+                    <p 
+                        id="smoothingTimeValue_info" 
+                        class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div> -->
+                <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        USER SLOPE
+                    </h1>
+                    <p 
+                        id="calibrationAValue_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div>
+                <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        USER INTERCEPT
+                    </h1>
+                    <p 
+                        id="calibrationBValue_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div>
+                <!-- Hiding this as per Client request -->
+                <!-- <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        MSN
+                    </h1>
+                    <p 
+                        id="MSN_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div> -->
+                <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                    <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                        Hours Used
+                    </h1>
+                    <p 
+                        id="userHoursValue_info" 
+                        class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                    >--</p>
+                </div>
+                </div>
+            </section>
+        </main>
+            
+        </section>
+        <section id="view-admin" class="view-content hidden">
+            <header class="fixed top-0 h-20 left-0 right-0 z-50 flex items-center justify-between p-4 bg-gray/300 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 transition-all duration-300">
+            <!-- <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 transition-all duration-300"> -->
+                <!-- <div class="flex-1 flex justify-start">
+                    <img src="./static/images/GE_logo.jpg" alt="Logo" class="h-8 w-auto object-contain">
+                </div> -->
+                <!-- <div class="flex-1 flex justify-start items-center">
+                    <div class="relative group">
+                        <img src="./static/images/GE_logo.jpg" 
+                            alt="Logo" 
+                            class="h-12 w-auto object-contain rounded-lg shadow-sm transition-all duration-300 group-hover:shadow-md group-hover:scale-105 border border-slate-200/50 dark:border-slate-700/50">
+                        
+                        <div class="absolute inset-0 rounded-lg bg-gradient-to-tr from-white/10 to-transparent pointer-events-none"></div>
+                    </div>
+                </div> -->
+            <nav class="flex items-center justify-between w-full px-6">
+                <div class="flex-1 h-20 flex items-center">
+                    <!-- <img src="./static/images/GE_logo.png" alt="Logo" class="h-12 w-auto object-contain"> -->
+                     <img src="./static/images/GE_logo_new.png" 
+                        alt="Logo" 
+                        class="h-16 w-auto object-contain dark:brightness-10">
+                </div>
+                <!-- <div class="flex-1 flex justify-center">
+                    <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">
+                    DustMonitorUM
+                    </h1>
+                </div> -->
+                <div class="flex-1 flex justify-center">
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-blue-600 to-cyan-500 rounded-lg blur opacity-0 group-hover:opacity-20 transition duration-500"></div>
+                        
+                        <h1 class="relative flex items-center gap-2">
+                            <span class="text-2xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-300 dark:to-white">
+                                DUST<span class="text-blue-600 dark:text-blue-400">MONITOR</span>
+                            </span>
+                                <!-- <span class="px-1.5 py-0.5 text-[10px] font-bold tracking-widest uppercase bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800 rounded">
+                                    UM
+                                </span> -->
+                        </h1>
+                    </div>
+                </div>
+                <div class="flex-1 flex items-center justify-end gap-3">
+                    
+                    <!-- <button id="darkModeBtn" class="group flex items-center justify-center w-11 h-11 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full transition-all duration-300 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                        <svg class="w-5 h-5 block dark:hidden transition-transform duration-500 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                        </svg>
+                        
+                        <svg class="w-5 h-5 hidden dark:block text-yellow-400 transition-transform duration-500 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 11H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                        </svg>
+                    </button> -->
+
+                    <button onclick="navigateTo('home')" class="group relative inline-flex items-center gap-3 px-6 py-2.5 bg-white/80 dark:bg-slate-800/80 backdrop-blur-md text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm tracking-wide transition-all duration-300 ease-out hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] active:scale-95 no-underline">
+    
+                        <span class="absolute inset-0 rounded-full bg-blue-400/0 group-hover:bg-blue-400/5 transition-colors duration-300"></span>
+
+                        <svg class="w-4 h-4 transition-all duration-300 transform group-hover:-translate-x-1 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12"></path>
+                        </svg>
+
+                        <span class="relative z-10">Back to Home</span>
+
+                        <svg class="w-5 h-5 transition-transform duration-300 group-hover:scale-110 text-slate-400 group-hover:text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </button>
+
+                </div>
+                </nav>
+            </header>
+        <main class="pt-24 p-6 space-y-6">
+            <!-- Device Configuration -->
+            <section class="mt-8 rounded-xl p-6 shadow bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-700" >
+                <div class="border-b border-slate-200 dark:border-slate-600 mb-6 pb-2">
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white">Device Configuration</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-x-12 gap-y-6">
+                    <!-- Commented the below item as client isn't using this and asked us to hide this field. -->
+                    <!-- <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                            >Smoothing Time (sec)</label
+                        >
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-smoothing"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('smoothing-time', 'sys-smoothing')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div> -->
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Range</label>
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-range"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('range', 'sys-range')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Alarm Threshold</label>
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-alarm"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('alarm', 'sys-alarm')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Network Address</label>
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-network"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('network-address', 'sys-network')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Correction Management -->
+            <section
+                class="rounded-xl p-6 shadow bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-700"
+            >
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-600 mb-6 pb-4"
+                >
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white">Correction Management</h2>
+
+                    <div class="flex space-x-1 bg-slate-100 dark:bg-slate-900/50 p-1 rounded-lg mt-4 sm:mt-0">
+                        <button
+                            onclick="switchCorrectionTab('coeff-tab')"
+                            id="btn-coeff-tab"
+                            class="corr-tab-btn px-4 py-1.5 text-sm font-medium rounded-md transition-all bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400"
+                        >
+                            Coefficient Correction
+                        </button>
+                        <button
+                            onclick="switchCorrectionTab('target-tab')"
+                            id="btn-target-tab"
+                            class="corr-tab-btn px-4 py-1.5 text-sm font-medium rounded-md transition-all text-slate-600 dark:text-slate-400"
+                        >
+                            Target Value Correction
+                        </button>
+                    </div>
+                </div>
+
+                <div id="coeff-tab" class="corr-content space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                >User Sloop</label
+                            >
+                            <div class="md:col-span-2 flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    id="sys-calibration-a"
+                                    min = "0"
+                                    max = "10"
+                                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                    placeholder="Enter value"
+                                />
+                                <button
+                                    onclick="updateSystemSetting('calibration-a', 'sys-calibration-a')"
+                                    class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                                >
+                                    <span>Set</span>
+                                    <svg
+                                        class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                >User Intercept</label
+                            >
+                            <div class="md:col-span-2 flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    id="sys-calibration-b"
+                                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                />
+                                <button
+                                    onclick="updateSystemSetting('calibration-b', 'sys-calibration-b')"
+                                    class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                                >
+                                    <span>Set</span>
+                                    <svg
+                                        class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="target-tab" class="corr-content hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                >Data Correction Factor</label
+                            >
+                            <div class="md:col-span-2 flex items-center gap-3">
+                                <input
+                                    type="text"
+                                    id="readonly-corr-factor"
+                                    readonly
+                                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200 cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <div class ="md:col-span-4 font-semibold text-slate-700 dark:text-slate-300">
+                                
+                                
+                                <div class="md:col-span-4 flex items-center gap-3">
+                                    <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                        >Correction Value</label
+                                    >
+                                    <input
+                                        type="number"
+                                        id="input-corr-value"
+                                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                        placeholder="Enter value"
+                                    />
+                                    <button
+                                        onclick="updateSystemSetting('correction-value', 'input-corr-value')"
+                                        class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                                    >
+                                        <span>Set</span>
+                                        <svg
+                                            class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                            ></path>
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        onclick="updateSystemSetting('cancel-correction-value', 'input-corr-value')"
+                                        class="group flex items-center gap-2 px-6 py-2.5 bg-red-50/50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-full font-bold text-sm transition-all duration-300 hover:border-red-500 hover:bg-red-500 hover:text-white hover:shadow-[0_8px_20px_rgba(239,68,68,0.3)] active:scale-95"
+                                    >
+                                        <span>Cancel</span>
+                                        <svg
+                                            class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                            ></path>
+                                        </svg>
+                                    </button>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calibration Management -->
+             <section
+                class="mt-8 rounded-xl p-6 shadow bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-700">
+                <div class="mt-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Calibration Management</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <button 
+                            onclick="updateCalibrations('manual-zero-calibration')"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-medium transition-all hover:bg-emerald-100 hover:shadow-md active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <line x1="12" y1="3" x2="12" y2="7"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                                <line x1="3" y1="12" x2="7" y2="12"></line>
+                                <line x1="17" y1="12" x2="21" y2="12"></line>
+                                <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                            </svg>
+                            Manual Zero Calibration
+                        </button>
+
+                        <button 
+                            onclick="updateCalibrations('cancel-zero-calibration')"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg font-medium transition-all hover:bg-blue-100 hover:shadow-md active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                            </svg>
+                            Cancel Zero Calibration Value
+                        </button>
+
+                        <button 
+                            onclick="updateCalibrations('range-calibration')"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-gray-700 border border-gray-200 rounded-lg font-medium transition-all hover:bg-gray-100 hover:shadow-md active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 18h20"></path>
+                                <path d="M2 14v4"></path>
+                                <path d="M7 14v4"></path>
+                                <path d="M12 10v8"></path>
+                                <path d="M17 14v4"></path>
+                                <path d="M22 14v4"></path>
+                                <path d="M12 2v4"></path>
+                                <path d="m9 5 3 3 3-3"></path>
+                            </svg>
+                            Range Calibration
+                        </button>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+        </section>
+
+    <script type="module">
+        // --- NAVIGATION LOGIC ---
+        window.navigateTo = function(page) {
+            const homeView = document.getElementById('view-home');
+            const adminView = document.getElementById('view-admin');
+
+            if (page === 'admin') {
+                homeView.classList.add('hidden');
+                adminView.classList.remove('hidden');
+            } else {
+                adminView.classList.add('hidden');
+                homeView.classList.remove('hidden');
+            }
+
+            window.scrollTo(0, 0);
+        };
+
+        // --- SHARED IMPORTS ---
+        import { startSensorStream, stopSensorStream } from "./static/js/websocket.js";
+        import { updateReading, updateDeviceInfo, initDarkMode, toggleDarkMode, populateSystemSettings, switchCorrectionTab, handleModifyCalibration, initChart, addChartData, loadFullHistory ,   checkDustLevel, updateDustAlert} from "./static/js/ui.js";
+        import { connectDevice, readSystemInfo, readData, updateSystemSetting, updateCalibrations, fetchHistory } from "./static/js/api.js";
+
+        // Initialize state
+        initDarkMode();
+        window.NETWORK_ADDRESS = 0;
+
+        // Global assignments for HTML onclicks
+        window.toggleDarkMode = toggleDarkMode;
+        window.updateSystemSetting = updateSystemSetting;
+        window.updateCalibrations = updateCalibrations;
+
+        const readDataBtn= document.getElementById("readDataBtn");
+        const stopBtn = document.getElementById("stopBtn");
+        const streamToggle = document.getElementById("streamToggle");
+        const secondsDropdown = document.getElementById("secondsDropdown");
+        const darkModeBtn = document.getElementById("darkModeBtn");
+        const connectBtn = document.getElementById("connectBtn");
+
+        connectBtn.addEventListener("click", async () => {
+            const resp = await connectDevice();
+            console.log("Device Connected"); 
+            try {
+                // Fetch fresh data from backend
+                const info = await readSystemInfo();
+                window.NETWORK_ADDRESS = info.parsed.network_address_info;
+                populateSystemSettings(info);
+                initChart();
+
+                const data = await fetchHistory();
+                if (data.history) {
+                    loadFullHistory(data.history);
+                }
+                navigateTo('home');
+            } catch (err) {
+                console.error("Failed to load system settings", err);
+            }         
+        });
+
+        secondsDropdown.disabled = !streamToggle.checked;
+        stopBtn.disabled = true;
+
+        streamToggle.addEventListener('change', () => {
+            const enabled = streamToggle.checked;
+            secondsDropdown.disabled = !enabled;
+        });
+
+        readDataBtn.addEventListener("click", async () => {
+         
+            const isStreaming = streamToggle.checked;
+            
+            if (!isStreaming) {
+                try {
+                        const resp =  await readData(25.5, NETWORK_ADDRESS);
+                        console.log("Read Info (Stop button):", resp.parsed);
+                        if (resp.parsed) {
+                            updateReading(resp.parsed);
+                            //   checkDustLevel();
+                              updateDustAlert();
+
+                            //To update Chart
+                            const timeNow = new Date().toLocaleTimeString();
+                            addChartData(timeNow, resp.parsed.dust_concentration);
+                        }
+                        else {
+                            console.error("Failed to fetch sensor info while Stop");
+                        }
+
+                } catch (error) {
+                    console.error("Error reading data once:", error);
+                }
+                return;
+                }
+
+
+            if (isStreaming) {
+                const selectedSeconds = Number(secondsDropdown.value);
+                stopBtn.disabled = false;
+                readDataBtn.disabled = true;
+                streamToggle.disabled = true;
+                secondsDropdown.disabled = true;
+                while (true) {
+                    const isStopped = stopBtn.disabled;
+                    if (isStopped) {
+                        console.log("Streaming stopped by user.");
+                        break;
+                    }
+                    try {
+                            const resp =  await readData(25.5, NETWORK_ADDRESS);
+                            console.log(`Read Info (Streaming every ${selectedSeconds} sec):`, resp.parsed);
+                            if (resp.parsed) {
+                                updateReading(resp.parsed);
+                                // checkDustLevel();
+                                updateDustAlert();
+                                //To update Chart
+                                const timeNow = new Date().toLocaleTimeString();
+                                addChartData(timeNow, resp.parsed.dust_concentration);
+                            }
+                            else {
+                                console.error("Failed to fetch sensor info while Streaming");
+                            }
+
+                    } catch (error) {
+                        console.error("Error reading data once:", error);
+                    }
+                    // Wait for selected seconds before next read
+                    await new Promise(resolve => setTimeout(resolve, selectedSeconds * 1000));
+                }
+            }
+        });
+
+        stopBtn.addEventListener("click", async () => {
+            stopBtn.disabled = true;
+            readDataBtn.disabled = false;
+            streamToggle.disabled = false;
+            secondsDropdown.disabled = false;
+        });
+
+        darkModeBtn.addEventListener("click", toggleDarkMode);
+
+        window.NETWORK_ADDRESS = 0;
+
+        window.updateSystemSetting = updateSystemSetting;
+        window.updateCalibrations = updateCalibrations;
+        window.switchCorrectionTab = switchCorrectionTab;
+        window.handleModifyCalibration = handleModifyCalibration;
+
+        window.addEventListener("DOMContentLoaded", async () => {
+            const currentPath = window.location.pathname;
+
+            if (currentPath === '/admin') {
+                navigateTo('admin');
+            } else {
+                navigateTo('home');
+            }   
+        });
+
+        // window.addEventListener("DOMContentLoaded", async () => {
+        //     initChart();
+            
+        //     const data = await fetchHistory();
+        //     if (data.history) {
+        //         loadFullHistory(data.history);
+        //     }
+        //     navigateTo('home');
+        // });
+
+    </script>
+  </body>
+</html>
