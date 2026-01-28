@@ -1,0 +1,506 @@
+<!doctype html>
+<html lang="en" class="light">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Admin</title>
+
+        <!-- Tailwind CDN -->
+        <!-- <script src="https://cdn.tailwindcss.com"></script>
+        <script>
+            tailwind.config = {
+                darkMode: "class",
+            };
+        </script> -->
+        <link href="/static/css/output.css" rel="stylesheet">
+    </head>
+
+    <body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors">
+        <!-- Header -->
+        <header class="flex items-center justify-between p-4 bg-white dark:bg-slate-900 border-b dark:border-slate-800">
+            <h1 class="text-xl font-bold text-slate-800 dark:text-white">Configuration Management</h1>
+            <div class="flex items-center gap-3">
+                <button
+                    id="darkModeToggleBtn"
+                    class="group flex items-center justify-center w-11 h-11 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full transition-all duration-300 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+                >
+                    <svg
+                        class="w-5 h-5 block dark:hidden transition-transform duration-500 group-hover:-rotate-12"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                        ></path>
+                    </svg>
+                    <svg
+                        class="w-5 h-5 hidden dark:block text-yellow-400 transition-transform duration-500 group-hover:rotate-90"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 11H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"
+                        ></path>
+                    </svg>
+                </button>
+
+                <a href="/" 
+                    class="group relative inline-flex items-center gap-3 px-6 py-2.5 
+                            bg-white/80 dark:bg-slate-800/80 backdrop-blur-md
+                            text-slate-700 dark:text-slate-200 
+                            border border-slate-200 dark:border-slate-700 
+                            rounded-full font-bold text-sm tracking-wide
+                            transition-all duration-300 ease-out
+                            hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] 
+                            active:scale-95 no-underline">
+                    
+                    <span class="absolute inset-0 rounded-full bg-blue-400/0 group-hover:bg-blue-400/5 transition-colors duration-300"></span>
+
+                    <svg class="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1" 
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+
+                    <svg class="w-5 h-5 transition-all duration-300 group-hover:scale-110 text-blue-500" 
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+
+                    <span class="relative z-10">Back to Home</span>
+                </a>
+            </div>
+        </header>
+
+        <main class="p-6 space-y-6">
+            <!-- Device Configuration -->
+
+            <section
+                class="mt-8 rounded-xl p-6 shadow bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-700"
+            >
+                <div class="border-b border-slate-200 dark:border-slate-600 mb-6 pb-2">
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white">Device Configuration</h2>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                            >Smoothing Time (sec)</label
+                        >
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-smoothing"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('smoothing-time', 'sys-smoothing')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Range</label>
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-range"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('range', 'sys-range')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Alarm Threshold</label>
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-alarm"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('alarm', 'sys-alarm')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)] active:scale-95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div
+                        class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                    >
+                        <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Network Address</label>
+                        <div class="md:col-span-2 flex items-center gap-3">
+                            <input
+                                type="number"
+                                id="sys-network"
+                                class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                placeholder="Enter value"
+                            />
+                            <button
+                                onclick="updateSystemSetting('network-address', 'sys-network')"
+                                class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                            >
+                                <span>Set</span>
+                                <svg
+                                    class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                    ></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <!-- Correction Management -->
+            <section
+                class="rounded-xl p-6 shadow bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-700"
+            >
+                <div
+                    class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-200 dark:border-slate-600 mb-6 pb-4"
+                >
+                    <h2 class="text-xl font-bold text-slate-800 dark:text-white">Correction Management</h2>
+
+                    <div class="flex space-x-1 bg-slate-100 dark:bg-slate-900/50 p-1 rounded-lg mt-4 sm:mt-0">
+                        <button
+                            onclick="switchCorrectionTab('coeff-tab')"
+                            id="btn-coeff-tab"
+                            class="corr-tab-btn px-4 py-1.5 text-sm font-medium rounded-md transition-all bg-white dark:bg-slate-700 shadow-sm text-blue-600 dark:text-blue-400"
+                        >
+                            Coefficient Correction
+                        </button>
+                        <button
+                            onclick="switchCorrectionTab('target-tab')"
+                            id="btn-target-tab"
+                            class="corr-tab-btn px-4 py-1.5 text-sm font-medium rounded-md transition-all text-slate-600 dark:text-slate-400"
+                        >
+                            Target Value Correction
+                        </button>
+                    </div>
+                </div>
+
+                <div id="coeff-tab" class="corr-content space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                >User Sloop</label
+                            >
+                            <div class="md:col-span-2 flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    id="sys-calibration-a"
+                                    min = "0"
+                                    max = "10"
+                                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                    placeholder="Enter value"
+                                />
+                                <button
+                                    onclick="updateSystemSetting('calibration-a', 'sys-calibration-a')"
+                                    class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                                >
+                                    <span>Set</span>
+                                    <svg
+                                        class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                >User Intercept</label
+                            >
+                            <div class="md:col-span-2 flex items-center gap-3">
+                                <input
+                                    type="number"
+                                    id="sys-calibration-b"
+                                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                />
+                                <button
+                                    onclick="updateSystemSetting('calibration-b', 'sys-calibration-b')"
+                                    class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                                >
+                                    <span>Set</span>
+                                    <svg
+                                        class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        viewBox="0 0 24 24"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            stroke-width="2"
+                                            d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                        ></path>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="target-tab" class="corr-content hidden space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                >Data Correction Factor</label
+                            >
+                            <div class="md:col-span-2 flex items-center gap-3">
+                                <input
+                                    type="text"
+                                    id="read-corr-factor"
+                                    readonly
+                                    class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200 cursor-not-allowed"
+                                />
+                            </div>
+                        </div>
+
+                        <div
+                            class="grid grid-cols-1 md:grid-cols-3 items-center gap-4 py-4 border-b border-slate-100 dark:border-slate-800 last:border-0"
+                        >
+                            <div class ="md:col-span-4 font-semibold text-slate-700 dark:text-slate-300">
+                                
+                                
+                                <div class="md:col-span-4 flex items-center gap-3">
+                                    <label class="text-sm font-semibold text-slate-600 dark:text-slate-400"
+                                        >Correction Value</label
+                                    >
+                                    <input
+                                        type="number"
+                                        id="input-corr-value"
+                                        class="w-full px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all text-slate-700 dark:text-slate-200"
+                                        placeholder="Enter value"
+                                    />
+                                    <button
+                                        onclick="updateSystemSetting('correction-value', 'input-corr-value')"
+                                        class="group flex items-center gap-2 px-6 py-2.5 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full font-bold text-sm transition-all duration-300 hover:border-blue-500 hover:text-blue-600 hover:shadow-[0__15px_rgba(59,13,246, 3)] active:scale-.95"
+                                    >
+                                        <span>Set</span>
+                                        <svg
+                                            class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                            ></path>
+                                        </svg>
+                                    </button>
+
+                                    <button
+                                        onclick="updateSystemSetting('cancel-correction-value', 'input-corr-value')"
+                                        class="group flex items-center gap-2 px-6 py-2.5 bg-red-50/50 dark:bg-red-950/20 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 rounded-full font-bold text-sm transition-all duration-300 hover:border-red-500 hover:bg-red-500 hover:text-white hover:shadow-[0_8px_20px_rgba(239,68,68,0.3)] active:scale-95"
+                                    >
+                                        <span>Cancel</span>
+                                        <svg
+                                            class="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path
+                                                stroke-linecap="round"
+                                                stroke-linejoin="round"
+                                                stroke-width="2"
+                                                d="M14 5l7 7m0 0l-7 7m7-7H3"
+                                            ></path>
+                                        </svg>
+                                    </button>                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Calibration Management -->
+             <section
+                class="mt-8 rounded-xl p-6 shadow bg-gradient-to-br from-white to-slate-50 dark:from-slate-800 dark:to-slate-700">
+                <div class="mt-6 p-6 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-6">Calibration Management</h3>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        
+                        <button 
+                            onclick="updateCalibrations('manual-zero-calibration')"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg font-medium transition-all hover:bg-emerald-100 hover:shadow-md active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="9"></circle>
+                                <line x1="12" y1="3" x2="12" y2="7"></line>
+                                <line x1="12" y1="17" x2="12" y2="21"></line>
+                                <line x1="3" y1="12" x2="7" y2="12"></line>
+                                <line x1="17" y1="12" x2="21" y2="12"></line>
+                                <circle cx="12" cy="12" r="1" fill="currentColor"></circle>
+                            </svg>
+                            Manual Zero Calibration
+                        </button>
+
+                        <button 
+                            onclick="updateCalibrations('cancel-zero-calibration')"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg font-medium transition-all hover:bg-blue-100 hover:shadow-md active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                                <path d="M3 3v5h5"></path>
+                                <line x1="9" y1="9" x2="15" y2="15"></line>
+                                <line x1="15" y1="9" x2="9" y2="15"></line>
+                            </svg>
+                            Cancel Zero Calibration Value
+                        </button>
+
+                        <button 
+                            onclick="updateCalibrations('range-calibration')"
+                            class="flex items-center justify-center gap-2 px-6 py-3 bg-gray-50 text-gray-700 border border-gray-200 rounded-lg font-medium transition-all hover:bg-gray-100 hover:shadow-md active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M2 18h20"></path>
+                                <path d="M2 14v4"></path>
+                                <path d="M7 14v4"></path>
+                                <path d="M12 10v8"></path>
+                                <path d="M17 14v4"></path>
+                                <path d="M22 14v4"></path>
+                                <path d="M12 2v4"></path>
+                                <path d="m9 5 3 3 3-3"></path>
+                            </svg>
+                            Range Calibration
+                        </button>
+
+                    </div>
+                </div>
+            </section>
+        </main>
+        <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3"></div>
+
+        <script type="module">
+            import {
+                populateSystemSettings,
+                toggleDarkMode,
+                switchCorrectionTab,
+                handleModifyCalibration
+                
+            } from "/static/js/ui.js";
+            import { readSystemInfo, updateSystemSetting, updateCalibrations } from "/static/js/api.js";
+
+            window.NETWORK_ADDRESS = 0;
+
+            window.updateSystemSetting = updateSystemSetting;
+            window.updateCalibrations = updateCalibrations;
+            // Make functions globally accessible for the 'onclick' attributes in the HTML
+            window.switchCorrectionTab = switchCorrectionTab;
+            window.handleModifyCalibration = handleModifyCalibration;
+
+            window.addEventListener("DOMContentLoaded", async () => {
+                try {
+                    // Fetch fresh data from backend
+                    const info = await readSystemInfo();
+                    window.NETWORK_ADDRESS = info.parsed.network_address_info;
+                    populateSystemSettings(info);
+                } catch (err) {
+                    console.error("Failed to load system settings", err);
+                }
+            });
+
+            const darkModeToggleBtn = document.getElementById("darkModeToggleBtn");
+            darkModeToggleBtn.addEventListener("click", () => {
+                toggleDarkMode();
+            });
+
+            // const backToDashboardBtn = document.getElementById("backToDashboardBtn");
+            // backToDashboardBtn.addEventListener("click", () => {
+            //   window.location.href = "/";
+            // });
+        </script>
+    </body>
+</html>

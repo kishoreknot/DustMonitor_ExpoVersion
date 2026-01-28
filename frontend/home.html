@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="en" class="light">
+   <head>
+      <meta charset="UTF-8"/>
+      <title>Device Dashboard</title>
+      <!-- Tailwind CDN -->
+      <!-- <script src="https://cdn.tailwindcss.com"></script>
+      <script>
+         tailwind.config = {
+             darkMode: "class",
+         };
+      </script> -->
+      <link href="/static/css/output.css" rel="stylesheet">
+   </head>
+   <body class="bg-slate-100 text-slate-800 dark:bg-slate-900 dark:text-slate-100 transition-colors">
+      <!-- Header -->
+      <header class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between p-4 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b dark:border-slate-800 transition-all duration-300"> 
+         <div class="flex-1 flex justify-start">
+            <img src="./static/images/GE_logo.jpg" alt="Logo" class="h-8 w-auto object-contain">
+         </div>
+         <div class="flex-1 flex justify-center">
+            <h1 class="text-xl font-bold text-slate-800 dark:text-white whitespace-nowrap">
+               DustMonitorUM
+            </h1>
+         </div>
+         <div class="flex-1 flex items-center justify-end gap-3">
+
+                  <button id="darkModeBtn" class="group flex items-center justify-center w-11 h-11 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-full transition-all duration-300 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]">
+                     <svg class="w-5 h-5 block dark:hidden transition-transform duration-500 group-hover:-rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                     </svg>
+                     <svg class="w-5 h-5 hidden dark:block text-yellow-400 transition-transform duration-500 group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 11H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M12 8a4 4 0 100 8 4 4 0 000-8z"></path>
+                     </svg>
+                  </button>
+
+                  <a href="/admin" 
+                        class="group relative inline-flex items-center gap-3 px-6 py-2.5 
+                              bg-white/80 dark:bg-slate-800/80 backdrop-blur-md
+                              text-slate-700 dark:text-slate-200 
+                              border border-slate-200 dark:border-slate-700 
+                              rounded-full font-bold text-sm tracking-wide
+                              transition-all duration-300 ease-out
+                              hover:border-blue-500 hover:text-blue-600 hover:shadow-[0_0_20px_rgba(59,130,246,0.4)] 
+                              active:scale-95 no-underline">
+                     
+                     <span class="absolute inset-0 rounded-full bg-blue-400/0 group-hover:bg-blue-400/5 transition-colors duration-300"></span>
+
+                     <svg class="w-5 h-5 transition-transform duration-1000 group-hover:rotate-[360deg] text-blue-500" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                     </svg>
+
+                     <span class="relative z-10">Control Center</span>
+
+                     <svg class="w-4 h-4 transition-all duration-300 transform group-hover:translate-x-1.5 group-hover:text-blue-600" 
+                           fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>
+                     </svg>
+                  </a>
+
+         </div>
+      </header>
+      <main class="pt-24 p-6 space-y-6">
+
+<!-- Device Readings -->
+         <section class="rounded-xl p-6 shadow
+            bg-gradient-to-br from-slate-50 to-slate-100
+            dark:from-slate-800 dark:to-slate-700">
+            <div class="flex justify-between items-center mb-4 gap-1">
+               <h2 class="text-lg font-semibold">Device Readings</h2>
+
+               <!--   Stream Data Toggle -->
+               <div class="flex flex-col md:flex-row md:items-center gap-4">
+                  <div class="flex items-center gap-1">
+
+                     <button 
+                        id="connectBtn" 
+                        class="relative inline-flex items-center justify-center px-6 py-3 overflow-hidden font-bold text-white transition-all duration-300 bg-slate-800 rounded-lg group active:scale-95 border border-slate-700 hover:bg-slate-700 shadow-lg"
+                     >
+                        <span class="relative flex h-3 w-3 mr-3">
+                              <span id="statusDotPing" class="absolute inline-flex h-full w-full rounded-full bg-slate-400 opacity-75"></span>
+                              <span id="statusDot" class="relative inline-flex rounded-full h-3 w-3 bg-slate-500"></span>
+                        </span>
+                        
+                        <span id="btnText" class="tracking-wider uppercase text-xs">Connect Device</span>
+                        
+                        <svg id="loadingSpinner" class="hidden animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                     </button>
+                     
+
+                     <span class="text-sm font-medium text-gray-800 dark:text-gray-200">
+                     Stream Data
+                     </span>
+                     <label class="relative inline-flex items-center cursor-pointer">
+                     <input type="checkbox" class="sr-only peer" id="streamToggle">
+                     <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-emerald-500 after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-5 dark:bg-gray-600 dark:peer-checked:bg-emerald-600">
+                     </div>
+                  </div>
+                  <div class="flex items-center gap-2">
+                     <span class="text-sm text-gray-700 dark:text-gray-300">
+                        Every
+                     </span>
+
+                     <select
+                        id="secondsDropdown"
+                        disabled
+                        class="text-sm rounded-lg border border-gray-300 bg-white px-3 py-1.5
+                              text-gray-800 shadow-sm focus:border-emerald-500 focus:ring-2
+                              focus:ring-emerald-500 focus:outline-none
+                              dark:bg-gray-700 dark:border-gray-600 dark:text-gray-200">
+                           <!--                  ${Array.from({length: 24}, (_, i) => `<option value="${i+2}">${i+2}</option>`).join('')}-->
+                        <!-- Options 2–25 seconds -->
+                        <option value="20">20</option>
+                        <option value="30">30</option>
+                        <option value="40">40</option>
+                        <option value="50">50</option>
+                        <option value="60">60</option>
+                        <!-- <option value="7">7</option>
+                        <option value="8">8</option>
+                        <option value="9">9</option>
+                        <option value="10">10</option>
+                        <option value="11">11</option>
+                        <option value="12">12</option>
+                        <option value="13">13</option>
+                        <option value="14">14</option>
+                        <option value="15">15</option>
+                        <option value="16">16</option>
+                        <option value="17">17</option>
+                        <option value="18">18</option>
+                        <option value="19">19</option>
+                        <option value="20">20</option>
+                        <option value="21">21</option>
+                        <option value="22">22</option>
+                        <option value="23">23</option>
+                        <option value="24">24</option>
+                        <option value="25">25</option> -->
+                     </select>
+
+                     <span class="text-sm text-gray-700 dark:text-gray-300">
+                        seconds
+                     </span>
+                  </div>
+               <!-- Read Sensor Data Button -->
+                  <div class="flex item-center gap-2">
+                     <button
+                        id="readDataBtn"
+                        class="px-5 py-2.5 rounded-lg text-sm font-semibold
+                        bg-emerald-500 text-white
+                        hover:bg-emerald-600
+                        active:bg-emerald-700
+                        focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2
+                        dark:bg-emerald-600 dark:hover:bg-emerald-500 dark:active:bg-emerald-700
+                        disabled:bg-slate-400
+                        disabled:text-slate-200
+                        disabled:cursor-not-allowed
+                        disabled:hover:bg-slate-400
+                        disabled:active:bg-slate-400">
+                     Read Sensor Data
+                     </button>
+                     <button
+                        id = "stopBtn"
+                        class="px-4 py-2 bg-red-500 text-white rounded-lg shadow hover:bg-red-600
+                              focus:outline-none focus:ring-2 focus:ring-red-400 disabled:opacity-50">
+                     Stop
+                     </button>
+                  </div>
+               </div>
+               </div>
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+
+                <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                   rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                   hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                   <!-- Card Label -->
+                   <p class="text-sm font-semibold uppercase tracking-wider mb-1">Network Address</p>
+                   <!-- Card Value -->
+                   <p id="networkAddressValue" class="text-3xl font-bold mb-2">--</p>
+                   <!-- Optional Unit / Info -->
+                <!--   <p class="text-sm opacity-80">Amperes</p>-->
+                </div>
+
+                <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                   rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                   hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                   <!-- Card Label -->
+                   <p class="text-xs font-semibold uppercase tracking-wider mb-1">Dust concentration</p>
+                   <!-- Card Value -->
+                   <p id="dustConcentrationValue" class="text-3xl font-bold mb-2">--</p>
+                   <!-- Optional Unit / Info -->
+                  <p class="text-sm opacity-80">Mg/Nm3</p>
+                </div>
+
+                <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                   rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                   hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                   <!-- Card Label -->
+                   <p class="text-sm font-semibold uppercase tracking-wider mb-1">PCB Temperature</p>
+                   <!-- Card Value -->
+                   <p id="pcbTempValue" class="text-3xl font-bold mb-2">--</p>
+                   <!-- Optional Unit / Info -->
+                   <p class="text-sm opacity-80">Celcius</p>
+                </div>
+
+                <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                   rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                   hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                   <!-- Card Label -->
+                   <p class="text-sm font-semibold uppercase tracking-wider mb-1">CURRENT LOOP</p>
+                   <!-- Card Value -->
+                   <p id="currentLoopValue" class="text-3xl font-bold mb-2">--</p>
+                   <!-- Optional Unit / Info -->
+                   <p class="text-sm opacity-80">(4-20mA)</p>
+                </div>
+
+                <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                   rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                   hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                   <!-- Card Label -->
+                   <p class="text-sm font-semibold uppercase tracking-wider mb-1">Laser Diode Signal</p>
+                   <!-- Card Value -->
+                   <p id="ldValue" class="text-3xl font-bold mb-2">--</p>
+                   <!-- Optional Unit / Info -->
+                  <p class="text-sm opacity-80">(mW)</p>
+                </div>
+
+                <div class="w-full bg-gradient-to-r from-emerald-400 to-teal-500
+                   rounded-xl shadow-lg transform transition-transform duration-300 hover:-translate-y-2
+                   hover:shadow-2xl p-6 text-center text-white cursor-pointer">
+
+                   <!-- Card Label -->
+                   <p class="text-sm font-semibold uppercase tracking-wider mb-1">Photodiode Signal</p>
+                   <!-- Card Value -->
+                   <p id="pdValue" class="text-3xl font-bold mb-2">--</p>
+                   <!-- Optional Unit / Info -->
+                  <p class="text-sm opacity-80">(V)</p>
+                </div>
+
+
+            </div>
+
+
+         </section>
+
+          <!-- Device Info -->
+         <section class="rounded-xl p-6 shadow
+            bg-gradient-to-br from-white to-slate-50
+            dark:from-slate-800 dark:to-slate-700">
+            <h2 class="text-lg font-semibold mb-4">Device Info</h2>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     Network Address
+                  </h1>
+                  <p
+                     id="networkAddressValue_info"
+                     class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div>
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     Range
+                  </h1>
+                  <div class="flex items-baseline gap-1">
+                  <p 
+                     id="rangeValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+                  <p>Mg/Nm3</p>
+                  </div>
+               </div>
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     Alarm Threshold
+                  </h1>
+                  <p 
+                     id="alarmThresholdValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>                 
+               </div>
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     Temp Auth Days
+                  </h1>
+                  <p 
+                     id="tempAuthDaysValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-3 mb-6">
+               <!-- <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     Smoothing Time (Sec)
+                  </h1>
+                  <p 
+                     id="smoothingTimeValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div> -->
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     USER SLOPE
+                  </h1>
+                  <p 
+                     id="calibrationAValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div>
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     USER INTERCEPT
+                  </h1>
+                  <p 
+                     id="calibrationBValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div>
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     MSN
+                  </h1>
+                  <p 
+                     id="MSN_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div>
+               <div class="px-3 py-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
+                  <h1 class="text-xs font-medium uppercase tracking-wide text-slate-500 dark:text-slate-400">
+                     Hours Used
+                  </h1>
+                  <p 
+                     id="userHoursValue_info" 
+                     class=class="mt-1 text-sm font-semibold text-slate-900 dark:text-slate-100"
+                  >--</p>
+               </div>
+            </div>
+         </section>
+      </main>
+      <!-- <div id="toast-container" class="fixed top-5 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-3"></div> -->
+
+   <script type="module">
+      import { startSensorStream, stopSensorStream } from "./static/js/websocket.js";
+      import { updateReading, updateDeviceInfo, initDarkMode, toggleDarkMode } from "./static/js/ui.js";
+      import { connectDevice, readSystemInfo, readData} from "./static/js/api.js";
+
+      initDarkMode();
+
+      const readDataBtn= document.getElementById("readDataBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const streamToggle = document.getElementById("streamToggle");
+      const secondsDropdown = document.getElementById("secondsDropdown");
+      // const NETWORK_ADDRESS = document.getElementById("networkAddressValue_info").textContent.trim; //<!-- will be replace dwith dynamic value -->
+      const darkModeBtn = document.getElementById("darkModeBtn");
+      const connectBtn = document.getElementById("connectBtn");
+      // let NETWORK_ADDRESS = null;
+
+      connectBtn.addEventListener("click", async () => {
+         const resp = await connectDevice();
+         console.log("Device Connected");
+         // NETWORK_ADDRESS = resp.json().parsed.network_address_info;
+         // console.log("NETWORK_ADDRESS after connect:", NETWORK_ADDRESS);
+         
+      });
+
+      // Decided to fetch system info only after connectnig the device through Connect Device button. Uncomment below if want to fetch on page load
+      // document.addEventListener("DOMContentLoaded", async () => {
+      //    try {
+      //       const info = await readSystemInfo();
+      //       console.log("System Info:", info);
+      //       if (info.parsed) {
+      //         updateDeviceInfo(info.parsed);
+      //         window.NETWORK_ADDRESS = parseInt(document.getElementById("networkAddressValue_info").textContent);
+      //         console.log("Updated Device Info on Load, network_address_info", info.parsed.network_address_info);
+      //       }
+      //       else {
+      //         console.error("Failed to fetch system info");
+      //       }
+      //    } catch (err) {
+      //       console.error("Error fetching system info:", err);
+      //    }
+      // });
+
+                // Initial state-->
+      secondsDropdown.disabled = !streamToggle.checked;
+      stopBtn.disabled = true;
+
+      streamToggle.addEventListener('change', () => {
+         const enabled = streamToggle.checked;
+         secondsDropdown.disabled = !enabled;
+      });
+
+
+      readDataBtn.addEventListener("click", async () => {
+         //stopSensorStream();
+         // try {
+         //      readData(25.5, NETWORK_ADDRESS)
+         // } catch (error) {
+         //      console.error("Error reading data once:", error);
+         // }
+         
+          const isStreaming = streamToggle.checked;
+          
+          if (!isStreaming) {
+               try {
+                     const resp =  await readData(25.5, NETWORK_ADDRESS);
+                     console.log("Read Info (Stop button):", resp.parsed);
+                     if (resp.parsed) {
+                        updateReading(resp.parsed);
+                     }
+                     else {
+                        console.error("Failed to fetch sensor info while Stop");
+                     }
+
+               } catch (error) {
+                  console.error("Error reading data once:", error);
+               }
+            return;
+            }
+
+
+          if (isStreaming) {
+               const selectedSeconds = Number(secondsDropdown.value);
+               stopBtn.disabled = false;
+               readDataBtn.disabled = true;
+               streamToggle.disabled = true;
+               secondsDropdown.disabled = true;
+               while (true) {
+                  const isStopped = stopBtn.disabled;
+                  if (isStopped) {
+                     console.log("Streaming stopped by user.");
+                     break;
+                  }
+                  try {
+                        const resp =  await readData(25.5, NETWORK_ADDRESS);
+                        console.log(`Read Info (Streaming every ${selectedSeconds} sec):`, resp.parsed);
+                        if (resp.parsed) {
+                           updateReading(resp.parsed);
+                        }
+                        else {
+                           console.error("Failed to fetch sensor info while Streaming");
+                        }
+
+                  } catch (error) {
+                     console.error("Error reading data once:", error);
+                  }
+                  // Wait for selected seconds before next read
+                  await new Promise(resolve => setTimeout(resolve, selectedSeconds * 1000));
+               }
+
+
+
+              
+
+         }
+
+          
+         
+         // Need to add logic to track whether already any streamin runs with some frequency, If yes then stop it first
+      //     const config = {
+      //       continuous: isStreaming ? 1 : 0,
+      //       period: isStreaming ? Number(secondsDropdown.value) : 25.5,
+      //       networkAddress: NETWORK_ADDRESS
+      //     };
+
+
+      //   startSensorStream( config, (data) => {
+      //       if (data.parsed) {
+      //         updateReading(data.parsed);
+      //       }
+      //       if (data?.error) {
+      //           console.error("Sensor error:", data.error);
+      //       }
+      //   });
+      //   stopSensorStream();
+        
+      });
+
+      stopBtn.addEventListener("click", async () => {
+         // stopSensorStream(); 
+      //    const config = {
+      //       continuous: 0,
+      //       period: 25.5,
+      //       networkAddress: NETWORK_ADDRESS
+      //     };
+
+
+      //   startSensorStream( config, (data) => {
+      //       if (data.parsed) {
+      //         updateReading(data.parsed);
+      //       }
+      //       if (data?.error) {
+      //           console.error("Sensor error:", data.error);
+      //       }
+      //    }
+      //   );
+         // try {
+         //       const resp =  await readData(25.5, NETWORK_ADDRESS);
+         //       console.log("Read Info (Stop button):", resp.parsed);
+         //       if (resp.parsed) {
+         //          updateReading(resp.parsed);
+         //       }
+         //       else {
+         //          console.error("Failed to fetch sensor info while Stop");
+         //       }
+
+         // } catch (error) {
+         //      console.error("Error reading data once:", error);
+         // }
+        stopBtn.disabled = true;
+        readDataBtn.disabled = false;
+        streamToggle.disabled = false;
+        secondsDropdown.disabled = false;
+      });
+
+      darkModeBtn.addEventListener("click", toggleDarkMode);
+   </script>
+
+   </body>
+</html>
