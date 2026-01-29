@@ -40,6 +40,9 @@ else:
     DATABASE_URL = f"sqlite:///{normalized_path}"
 
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+current_db_host = engine.url.host
+print(current_db_host)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
