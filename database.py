@@ -63,6 +63,7 @@ def get_db():
     db = SessionLocal()
     print("current_db_host", current_db_host)
     print("DATABASE_URL: ", DATABASE_URL)
+    print("DEBUG: All Env Keys:", os.environ.keys())
     try:
         yield db
     finally:
