@@ -78,6 +78,7 @@ export async function connectDevice() {
             btnText.innerText = "Connected";
             btn.classList.add('bg-green-600');
             networkAddress = data.parsed.network_address_info;
+            // window.NETWORK_ADDRESS = networkAddress;
             showToast(`Connected! Device Address: ${networkAddress}`, 'success');
             return data
         } else {
@@ -179,9 +180,11 @@ export async function stopReading() {
 export async function readData(period_in_seconds) {
     
     if (isReading && period_in_seconds > 0) return;
-    console.log("Debug readData", period_in_seconds)
-
+    console.log("Debug readData", period_in_seconds);
+    console.log("Debug readData.networkAddress", networkAddress)
     // 1. Construct Hex Command using the global networkAddress
+    // const netH = (window.NETWORK_ADDRESS >> 8) & 0xFF;
+    // const netL = window.NETWORK_ADDRESS & 0xFF;
     const netH = (networkAddress >> 8) & 0xFF;
     const netL = networkAddress & 0xFF;
     const freq = 0xFF
@@ -339,7 +342,8 @@ export async function updateSystemSetting(type, inputId) {
             showToast(`${type.replace(/-/g, ' ')} updated!`, 'success');
             
             // Update local memory if address changed
-            if (type === 'network-address') window.NETWORK_ADDRESS = parseInt(inputValue);
+            // if (type === 'network-address') window.NETWORK_ADDRESS = parseInt(inputValue);
+            if (type === 'network-address') networkAddress = parseInt(inputValue);
 
             // 3. Refresh System Info to sync UI
             const info = await readSystemInfo();
@@ -357,7 +361,8 @@ export async function updateSystemSetting(type, inputId) {
 }
 
 export async function updateCalibrations(type) {
-    const currentNetAddr = parseInt(window.NETWORK_ADDRESS);
+    // const currentNetAddr = parseInt(window.NETWORK_ADDRESS);
+    const currentNetAddr = parseInt(networkAddress);
     let cmdId = 0;
     let ackKey = "";
 

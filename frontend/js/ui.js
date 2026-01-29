@@ -21,6 +21,14 @@ export function updateReading(parsed) {
 
 }
 
+// Helper function to handle UI updates to keep code DRY (Don't Repeat Yourself)
+export function processNewData(parsed) {
+    updateReading(parsed);
+    updateDustAlert();
+    const timeNow = new Date().toLocaleTimeString();
+    addChartData(timeNow, parsed.dust_concentration);
+}
+
 export function updateDeviceInfo(parsed) {
   console.log("updateDeviceInfo called with:", parsed);
 
