@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, Float, DateTime, create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-import datetime
+from datetime import datetime, timezone
 import os, sys
 
 # SQLite database file path
@@ -27,19 +27,50 @@ def get_db_path():
     print("db_path:", db_path)
     return db_path
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+# DATABASE_URL = os.environ.get("DATABASE_URL")
 
-if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
-    # SQLAlchemy requires 'postgresql://' not 'postgres://' (Supabase sometimes provides the latter)
-    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+#     # SQLAlchemy requires 'postgresql://' not 'postgres://' (Supabase sometimes provides the latter)
+#     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+# else:
+#     # DATABASE_URL = "sqlite:///./local_dev.db"
+#     db_path = get_db_path()
+
+#     normalized_path = db_path.replace(os.sep, '/')
+#     DATABASE_URL = f"sqlite:///{normalized_path}"
+
+# engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
+################
+
+# 1. Pull the raw URL from the environment
+raw_url = os.environ.get("DATABASE_URL")
+
+# 2. Logic to determine final URL
+if raw_url:
+    # Handle the Supabase/Heroku 'postgres://' quirk
+    if raw_url.startswith("postgres://"):
+        DATABASE_URL = raw_url.replace("postgres://", "postgresql://", 1)
+    else:
+        DATABASE_URL = raw_url
 else:
-    # DATABASE_URL = "sqlite:///./local_dev.db"
-    db_path = get_db_path()
-
+    # Local fallback
+    db_path = get_db_path() # Your existing function
     normalized_path = db_path.replace(os.sep, '/')
     DATABASE_URL = f"sqlite:///{normalized_path}"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+# 3. Create the engine
+# Note: check_same_thread is ONLY for SQLite
+engine_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    engine_args["connect_args"] = {"check_same_thread": False}
+
+engine = create_engine(DATABASE_URL, **engine_args)
+
+# For your debug print:
+print(f"CONNECTED TO HOST: {engine.url.host}") 
+print(f"FULL URL USED: {DATABASE_URL}")
+################
 
 current_db_host = engine.url.host
 print(current_db_host)
@@ -51,7 +82,7 @@ class DeviceReading(Base):
     __tablename__ = "readings"
     id = Column(Integer, primary_key=True, index=True)
     # timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
-    timestamp = Column(DateTime(timezone=True), server_default=func.now())
+    timestamp = Column(DateTime(timezone=True), server_default=datetime.now(timezone.utc).isoformat())
     network_address = Column(Integer)
     dust_concentration = Column(Float)
     pcb_temp = Column(Float)

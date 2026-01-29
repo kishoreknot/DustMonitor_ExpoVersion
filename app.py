@@ -226,7 +226,7 @@ async def get_reading_history(db: Session = Depends(get_db)):
     return {
         "history": [
             {
-                "timestamp": r.timestamp.strftime("%H:%M:%S"), # Format for chart labels
+                "timestamp": r.timestamp.isoformat() ,#r.timestamp.strftime("%H:%M:%S"), # Format for chart labels
                 "dust": r.dust_concentration,
                 "temp": r.pcb_temp,
                 "current": r.current_loop
