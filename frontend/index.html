@@ -854,8 +854,8 @@
 
         // --- SHARED IMPORTS ---
         import { startSensorStream, stopSensorStream } from "./static/js/websocket.js";
-        import { updateReading, updateDeviceInfo, initDarkMode, toggleDarkMode, populateSystemSettings, switchCorrectionTab, handleModifyCalibration, initChart, addChartData, loadFullHistory ,   checkDustLevel, updateDustAlert} from "./static/js/ui.js";
-        import { connectDevice, readSystemInfo, readData, updateSystemSetting, updateCalibrations, fetchHistory } from "./static/js/api.js";
+        import { updateReading, updateDeviceInfo, initDarkMode, toggleDarkMode, populateSystemSettings, switchCorrectionTab, handleModifyCalibration, initChart, addChartData, loadFullHistory ,   checkDustLevel, updateDustAlert, processNewData, showToast} from "./static/js/ui.js";
+        import { connectDevice, readSystemInfo, readData, updateSystemSetting, updateCalibrations, fetchHistory, stopReading } from "./static/js/api.js";
 
         // Initialize state
         initDarkMode();
@@ -874,112 +874,92 @@
         const connectBtn = document.getElementById("connectBtn");
 
         connectBtn.addEventListener("click", async () => {
-            const resp = await connectDevice();
-            console.log("Device Connected"); 
             try {
-                // Fetch fresh data from backend
-                const info = await readSystemInfo();
-                window.NETWORK_ADDRESS = info.parsed.network_address_info;
-                populateSystemSettings(info);
-                initChart();
+                const info = await connectDevice();
+                console.log("Device Connected"); 
 
-                const data = await fetchHistory();
-                if (data.history) {
-                    loadFullHistory(data.history);
-                }
-                navigateTo('home');
+                if (info && info.parsed) {
+                    console.log("Device Connected & Identified:", info.parsed);
+                
+                    window.NETWORK_ADDRESS = info.parsed.network_address_info;
+                    populateSystemSettings(info);
+                    initChart();
+
+                    const data = await fetchHistory();
+                    if (data && data.history) {
+                        loadFullHistory(data.history);
+                    }
+                    navigateTo('home');
+                } 
             } catch (err) {
-                console.error("Failed to load system settings", err);
+                console.error("Connection Flow Failed:", err);
             }         
         });
 
         secondsDropdown.disabled = !streamToggle.checked;
         stopBtn.disabled = true;
 
+
         streamToggle.addEventListener('change', () => {
             const enabled = streamToggle.checked;
             secondsDropdown.disabled = !enabled;
         });
 
+        
         readDataBtn.addEventListener("click", async () => {
-         
             const isStreaming = streamToggle.checked;
-            
+            const selectedSeconds = Number(secondsDropdown.value);
+
             if (!isStreaming) {
+                // SINGLE READ MODE
                 try {
-                        const resp =  await readData(25.5, NETWORK_ADDRESS);
-                        console.log("Read Info (Stop button):", resp.parsed);
-                        if (resp.parsed) {
-                            updateReading(resp.parsed);
-                            //   checkDustLevel();
-                              updateDustAlert();
-
-                            //To update Chart
-                            const timeNow = new Date().toLocaleTimeString();
-                            addChartData(timeNow, resp.parsed.dust_concentration);
-                        }
-                        else {
-                            console.error("Failed to fetch sensor info while Stop");
-                        }
-
+                    // We pass null or 0 for period to indicate a single shot
+                    const resp = await readData(0); 
+                    if (resp && resp.parsed) {
+                        processNewData(resp.parsed);
+                    }
                 } catch (error) {
                     console.error("Error reading data once:", error);
                 }
-                return;
-                }
-
-
-            if (isStreaming) {
-                const selectedSeconds = Number(secondsDropdown.value);
+            } else {
+                // STREAMING MODE
+                // Disable UI elements to prevent duplicate clicks
                 stopBtn.disabled = false;
                 readDataBtn.disabled = true;
                 streamToggle.disabled = true;
                 secondsDropdown.disabled = true;
-                while (true) {
-                    const isStopped = stopBtn.disabled;
-                    if (isStopped) {
-                        console.log("Streaming stopped by user.");
-                        break;
-                    }
-                    try {
-                            const resp =  await readData(25.5, NETWORK_ADDRESS);
-                            console.log(`Read Info (Streaming every ${selectedSeconds} sec):`, resp.parsed);
-                            if (resp.parsed) {
-                                updateReading(resp.parsed);
-                                // checkDustLevel();
-                                updateDustAlert();
-                                //To update Chart
-                                const timeNow = new Date().toLocaleTimeString();
-                                addChartData(timeNow, resp.parsed.dust_concentration);
-                            }
-                            else {
-                                console.error("Failed to fetch sensor info while Streaming");
-                            }
 
-                    } catch (error) {
-                        console.error("Error reading data once:", error);
-                    }
-                    // Wait for selected seconds before next read
-                    await new Promise(resolve => setTimeout(resolve, selectedSeconds * 1000));
-                }
+                // Start the continuous loop inside api.js
+                // We don't 'await' this because it's a continuous loop
+                readData(selectedSeconds); 
             }
         });
 
+        // New Listener for the Stop Button
         stopBtn.addEventListener("click", async () => {
+            // 1. Trigger the stop flag in api.js
+            await stopReading();
+
+            // 2. Re-enable UI elements
             stopBtn.disabled = true;
             readDataBtn.disabled = false;
             streamToggle.disabled = false;
             secondsDropdown.disabled = false;
+
+            showToast("Streaming Stopped", "info");
         });
+
+
 
         darkModeBtn.addEventListener("click", toggleDarkMode);
 
-        window.NETWORK_ADDRESS = 0;
+        // window.NETWORK_ADDRESS = 0;
 
         window.updateSystemSetting = updateSystemSetting;
         window.updateCalibrations = updateCalibrations;
         window.switchCorrectionTab = switchCorrectionTab;
         window.handleModifyCalibration = handleModifyCalibration;
+        window.processNewData = processNewData;
 
         window.addEventListener("DOMContentLoaded", async () => {
             const currentPath = window.location.pathname;

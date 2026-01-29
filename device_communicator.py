@@ -221,23 +221,23 @@ def decode_response(hexstr: str) -> dict:
         decoded_resp["TimeUserHours"] = int.from_bytes(b[51:53], "big")
         decoded_resp["MSN"] = int.from_bytes(b[55:57], "big")
         decoded_resp["alarm_threshold"] = int.from_bytes(b[59:61], "big")
-        print("***********************decode_response:************************\n", decoded_resp)
+        
     elif cmdId == 0x97:
         decoded_resp["set_network_address_ack"] = "Success"
         decoded_resp["new_network_address"] = int.from_bytes(b[2:4], "big")
-        print("***********************decode_response:************************\n", decoded_resp)
+        
     elif cmdId == 0x8C:
         decoded_resp["set_smoothing_time_ack"] = "Success"
         decoded_resp["new_smoothing_time_sec"] = struct.unpack(">f", b[5:9])[0]
-        print("***********************decode_response:************************\n", decoded_resp)
+        
     elif cmdId == 0x9D:
         decoded_resp["set_range_ack"] = "Success"
         decoded_resp["new_range"] = int.from_bytes(b[5:7], "big")
-        print("***********************decode_response:************************\n", decoded_resp)
+        
     elif cmdId == 0x9A:
         decoded_resp["set_alarm_ack"] = "Success"
         decoded_resp["new_alarm_threshold"] = int.from_bytes(b[5:7], "big")
-        print("***********************decode_response:************************\n", decoded_resp)
+        
     elif cmdId == 0xCF:
         decoded_resp["set_calibration_a_ack"] = "Success"
         decoded_resp["new_calibration_a"] = struct.unpack(">f", b[5:9])[0]

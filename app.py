@@ -91,8 +91,38 @@ app = FastAPI(lifespan= lifespan)
 
 from fastapi import Response
 
+class RawHexModel(BaseModel):
+    raw_hex: str
 
-
+@app.post("/api/decode-info")
+async def decode_info(data: RawHexModel):
+    # This takes the hex string sent by JS and uses your existing logic
+    try:
+        parsed = decode_response(data.raw_hex)
+        return {"raw": data.raw_hex, "parsed": parsed}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+@app.post("/api/store-reading")
+async def store_reading(data: RawHexModel, db: Session = Depends(get_db)):
+    # Decodes and saves to Supabase
+    try:
+        parsed_info = decode_response(data.raw_hex)
+        if parsed_info:
+            new_reading = DeviceReading(
+                network_address = parsed_info.get("network_address"),
+                dust_concentration = parsed_info.get("dust_concentration"),
+                pcb_temp = parsed_info.get("pcb_temp"),
+                current_loop = parsed_info.get("current_loop"),
+                laser_diode_signal = parsed_info.get("ld"),
+                photo_diode_signal = parsed_info.get("pd")
+            )
+            db.add(new_reading)
+            db.commit()
+            return {"status": "success", "parsed": parsed_info}
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
