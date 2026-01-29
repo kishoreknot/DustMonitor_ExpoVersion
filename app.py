@@ -1,4 +1,4 @@
-import os, sys, threading, webview
+import os, sys, threading#, webview
 from fastapi import (FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends)
 from pydantic import BaseModel, Field
 from fastapi.responses import FileResponse
@@ -543,8 +543,8 @@ async def set_calibration_setup(data: deviceCalibrationModel):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 #Uncomment below to run FastAPI with webview directly from this file
-if __name__ == "__main__":
-    threading.Thread(target=run_fastapi, daemon=True).start()
+# if __name__ == "__main__":
+#     threading.Thread(target=run_fastapi, daemon=True).start()
 
-    webview.create_window('UserMonitor_v1', 'http://127.0.0.1:8000')
-    webview.start()
+#     webview.create_window('UserMonitor_v1', 'http://127.0.0.1:8000')
+#     webview.start()
