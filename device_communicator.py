@@ -1,5 +1,6 @@
 import json, os, sys, logging, struct, serial, threading
 import serial.tools.list_ports
+from database import engine
 
 
 
@@ -188,6 +189,7 @@ def decode_response(hexstr: str) -> dict:
     cmdId = b[4]
     # print("****************cmdId****************", cmdId)
     if cmdId == 0xC9:
+        print("My News---->",engine.url.host) #KIDEL
         if len(b) < 39:
             print(f"!!! CRITICAL: Received short packet ({len(b)} bytes). Skipping decode.")
             return {"error": "incomplete response for command C9"}
