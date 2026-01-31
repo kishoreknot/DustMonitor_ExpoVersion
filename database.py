@@ -15,66 +15,51 @@ def get_db_path():
     if getattr(sys, 'frozen', False):
         # On Windows, this points to C:\Users\Username\AppData\Local
         base_dir = os.environ.get('LOCALAPPDATA', os.path.expanduser('~'))
+        print("database.frozen.false", base_dir)
     else:
         # During development, keep it in the script directory
         base_dir = os.path.dirname(os.path.abspath(__file__))
+        print("database.frozen.true", base_dir)
 
     # Create a dedicated subfolder if it doesn't exist
     data_dir = os.path.join(base_dir, app_name)
+    print("database.datadir", data_dir)
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
+        print("database.path.notexist", data_dir)
     db_path = os.path.join(data_dir, "dustmonitor.db")
-    print("db_path:", db_path)
+    print("database.db_path", db_path)
     return db_path
 
-# DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("DATABASE_URL")
+print("database.DATABASE_URL", DATABASE_URL)
+# DATABASE_URL = 'Something'
 
-# if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+if not DATABASE_URL:
+    db_path = get_db_path()
+    normalized_path = db_path.replace(os.sep, '/')
+    DATABASE_URL = f"sqlite:///{normalized_path}"
+    print("Final Databaseurl: ", DATABASE_URL)
+else:
+    print('DATABASE URL set to', DATABASE_URL)
+
+# if DATABASE_URL and DATABASE_URL.startswith("postgresql"):
 #     # SQLAlchemy requires 'postgresql://' not 'postgres://' (Supabase sometimes provides the latter)
 #     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 # else:
 #     # DATABASE_URL = "sqlite:///./local_dev.db"
 #     db_path = get_db_path()
-
 #     normalized_path = db_path.replace(os.sep, '/')
 #     DATABASE_URL = f"sqlite:///{normalized_path}"
 
-# engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 
-################
 
-# 1. Pull the raw URL from the environment
-raw_url = os.environ.get("DATABASE_URL")
 
-# 2. Logic to determine final URL
-if raw_url:
-    # Handle the Supabase/Heroku 'postgres://' quirk
-    if raw_url.startswith("postgres://"):
-        DATABASE_URL = raw_url.replace("postgres://", "postgresql://", 1)
-    else:
-        DATABASE_URL = raw_url
-else:
-    # Local fallback
-    db_path = get_db_path() # Your existing function
-    normalized_path = db_path.replace(os.sep, '/')
-    DATABASE_URL = f"sqlite:///{normalized_path}"
-
-# 3. Create the engine
-# Note: check_same_thread is ONLY for SQLite
-engine_args = {}
-if DATABASE_URL.startswith("sqlite"):
-    engine_args["connect_args"] = {"check_same_thread": False}
-
-engine = create_engine(DATABASE_URL, **engine_args)
-
-# For your debug print:
-print(f"CONNECTED TO HOST: {engine.url.host}") 
-print(f"FULL URL USED: {DATABASE_URL}")
-################
-
-current_db_host = engine.url.host
-print(current_db_host)
+# current_db_host = engine.url.host
+# print(current_db_host)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 Base = declarative_base()
 
 # 1. Table for periodic readings
@@ -92,9 +77,10 @@ class DeviceReading(Base):
 
 def get_db():
     db = SessionLocal()
-    print("current_db_host", current_db_host)
+    # print("current_db_host", current_db_host)
+    print(f"CONNECTED TO HOST2: {engine.url.host}") 
     print("DATABASE_URL: ", DATABASE_URL)
-    print("DEBUG: All Env Keys:", os.environ.keys())
+    # print("DEBUG: All Env Keys:", os.environ.keys())
     try:
         yield db
     finally:

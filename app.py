@@ -1,19 +1,22 @@
-import os, sys, threading#, webview
+#General
+import os, sys, logging #threading, webview
+
+#API Specific
 from fastapi import (FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends)
 from pydantic import BaseModel, Field
 from fastapi.responses import FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-#This was used for lifespan management. Need to uncomment if needed again
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager #This was used for lifespan management. Need to uncomment if needed again
 import asyncio
-
-#Deployment
 import uvicorn
 
-from fastapi.staticfiles import StaticFiles
+#Database imports
+from database import DeviceReading, get_db, Base, get_db_path , engine
+from sqlalchemy.orm import Session
+from sqlalchemy import desc
 
-
+#Internal
 from device_communicator import (send_and_receive, 
                                  decode_response, 
                                  load_config, 
@@ -21,11 +24,9 @@ from device_communicator import (send_and_receive,
                                  serial_connection,
                                  device_status)
 
-#Database imports
-from database import DeviceReading, get_db, Base, engine
-from sqlalchemy.orm import Session
-from sqlalchemy import desc
+logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
+#Pydantic class models, this needs unification. Some redundency in the current implementation
 class SensorDataModel(BaseModel):
     period_in_seconds: float = Field(..., ge=2, description="Period in seconds for data reading")
     network_address: int = Field(..., description="Network address of the device")
@@ -67,6 +68,8 @@ else:
     # If running as a script, the base path is the current file's folder
     BASE = os.path.dirname(os.path.abspath(__file__))
 
+logging.debug(BASE)
+
 FRONTEND_DIR = os.path.join(BASE, "frontend")
 
 #Used this to create the connection at startup, but now moving to button based connection
@@ -79,7 +82,15 @@ FRONTEND_DIR = os.path.join(BASE, "frontend")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("Starting up: Checking database connection...")
+    # print("Starting up: Checking database connection...")
+    # from sqlalchemy import create_engine
+    # DATABASE_URL = os.environ.get('DATABASE_URL')
+    # if not DATABASE_URL:
+    #     db_path = get_db_path()
+    #     normalized_path = db_path.replace(os.sep, '/')
+    #     DATABASE_URL = f"sqlite:///{normalized_path}"
+    # print("DATABASE_URL", DATABASE_URL)        
+    # engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
     Base.metadata.create_all(bind=engine)
     yield
     # Shutdown: Clean up if necessary
