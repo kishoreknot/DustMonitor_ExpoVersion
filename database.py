@@ -43,6 +43,10 @@ if not DATABASE_URL:
 else:
     print('DATABASE URL set to', DATABASE_URL)
 
+connect_args = {}
+if DATABASE_URL.startswith("sqlite"):
+    connect_args = {"check_same_thread": False}
+
 # if DATABASE_URL and DATABASE_URL.startswith("postgresql"):
 #     # SQLAlchemy requires 'postgresql://' not 'postgres://' (Supabase sometimes provides the latter)
 #     DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
@@ -52,7 +56,7 @@ else:
 #     normalized_path = db_path.replace(os.sep, '/')
 #     DATABASE_URL = f"sqlite:///{normalized_path}"
 
-engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(DATABASE_URL, connect_args=connect_args)
 
 
 
