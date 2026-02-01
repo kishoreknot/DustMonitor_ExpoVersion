@@ -18,10 +18,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import desc
 
 #Internal
-from device_communicator import (send_and_receive, 
+from device_communicator import (#send_and_receive, 
                                  decode_response, 
                                  load_config, 
-                                 get_serial_connection, 
+                                 #get_serial_connection, 
                                  serial_connection,
                                  device_status)
 
@@ -230,11 +230,11 @@ def store_reading(data: RawHexModel, db: Session = Depends(get_db)):
 @app.get("/api/get-reading-history")
 async def get_reading_history(db: Session = Depends(get_db)):
     readings = db.query(DeviceReading)\
-        .order_by(DeviceReading.timestamp)\
+        .order_by(desc(DeviceReading.timestamp))\
         .limit(20)\
         .all()
     
-    # readings.reverse()
+    readings.reverse()
 
     return {
         "history": [
