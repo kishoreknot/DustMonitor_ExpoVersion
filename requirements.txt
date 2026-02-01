@@ -6,3 +6,4 @@ pyserial==3.5
 sqlalchemy
 psycopg2-binary
 pytz
+alembic

@@ -1,3 +1,5 @@
+// import { g_alarm_threshold } from "./api.js";
+
 export function updateReading(parsed) {
   if (!parsed) return;
 
@@ -40,6 +42,7 @@ export function updateDeviceInfo(parsed) {
 
   document.querySelector("#alarmThresholdValue_info").textContent = 
     parsed.alarm_threshold ?? "--";
+  window.g_alarm_threshold = parsed.alarm_threshold;
     
   // document.querySelector("#smoothingTimeValue_info").textContent = 
   //   parsed.smoothing_time_sec ?? "--";

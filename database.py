@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, DateTime, create_engine, func
+from sqlalchemy import Column, Integer, Float, DateTime, Boolean,  create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timezone
@@ -60,7 +60,6 @@ def get_encoded_url():
     return url
 
 DATABASE_URL = get_encoded_url() #os.environ.get("DATABASE_URL")
-print("Final database.DATABASE_URL", DATABASE_URL)
 # DATABASE_URL = 'Something'
 
 connect_args = {}
@@ -99,13 +98,11 @@ class DeviceReading(Base):
     current_loop = Column(Float)
     laser_diode_signal = Column(Integer)
     photo_diode_signal = Column(Integer)
+    alarm_threshold = Column(Integer)
+    alarm_raised = Column(Boolean, default=False)
 
 def get_db():
     db = SessionLocal()
-    # print("current_db_host", current_db_host)
-    print(f"CONNECTED TO HOST2: {engine.url.host}") 
-    print("DATABASE_URL: ", DATABASE_URL)
-    # print("DEBUG: All Env Keys:", os.environ.keys())
     try:
         yield db
     finally:

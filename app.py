@@ -1,6 +1,7 @@
 #General
 import os, sys, logging #threading, webview
 import pytz
+import traceback
 
 #API Specific
 from fastapi import (FastAPI, HTTPException, WebSocket, WebSocketDisconnect, Depends)
@@ -86,7 +87,7 @@ IST = pytz.timezone('Asia/Kolkata')
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("Starting up: Checking database connection...")
-    Base.metadata.create_all(bind=engine)
+    #Base.metadata.create_all(bind=engine)
     yield
     # Shutdown: Clean up if necessary
     print("Shutting down...")
@@ -102,6 +103,10 @@ from fastapi import Response
 
 class RawHexModel(BaseModel):
     raw_hex: str
+
+class DataStoreModel(BaseModel):
+    raw_hex: str
+    alarm_threshold: int
 
 
 
@@ -157,10 +162,13 @@ async def decode_info(data: RawHexModel):
     
 #Converted this call from async to normal call as db session that we are creation here is a sync character.    
 @app.post("/api/store-reading")
-def store_reading(data: RawHexModel, db: Session = Depends(get_db)):
+def store_reading(data: DataStoreModel,  db: Session = Depends(get_db)):
     # Decodes and saves to Database
     try:
+        alarm_raised = None
         parsed_info = decode_response(data.raw_hex)
+        if parsed_info.get("dust_concentration") > data.alarm_threshold:
+            alarm_raised = True
         if parsed_info:
             new_reading = DeviceReading(
                 network_address = parsed_info.get("network_address"),
@@ -168,13 +176,20 @@ def store_reading(data: RawHexModel, db: Session = Depends(get_db)):
                 pcb_temp = parsed_info.get("pcb_temp"),
                 current_loop = parsed_info.get("current_loop"),
                 laser_diode_signal = parsed_info.get("ld"),
-                photo_diode_signal = parsed_info.get("pd")
+                photo_diode_signal = parsed_info.get("pd"),
+                alarm_threshold = data.alarm_threshold,
+                alarm_raised = alarm_raised
             )
             db.add(new_reading)
             db.commit()
             return {"status": "success", "parsed": parsed_info}
     except Exception as e:
         db.rollback()
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=500, 
+            detail=f"Database Saving Error: {type(e).__name__} - {str(e)}"
+        )
         raise HTTPException(status_code=500, detail=str(e))
 
 

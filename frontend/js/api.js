@@ -3,6 +3,7 @@ import { showToast, updateDeviceInfo, populateSystemSettings,checkDustLevel } fr
 let serialPort = null;
 let networkAddress = null;
 const API_BASE = ""; 
+// let g_alarm_threshold = null
 
 const hexToBytes = (hex) => {
     // 1. Ensure it's a string and trim whitespace
@@ -78,6 +79,7 @@ export async function connectDevice() {
             btnText.innerText = "Connected";
             btn.classList.add('bg-green-600');
             networkAddress = data.parsed.network_address_info;
+            window.g_alarm_threshold = data.parsed.alarm_threshold;
             // window.NETWORK_ADDRESS = networkAddress;
             showToast(`Connected! Device Address: ${networkAddress}`, 'success');
             return data
@@ -216,7 +218,7 @@ async function executeSingleRead(hexCmd) {
         const res = await fetch(`${API_BASE}/api/store-reading`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ raw_hex: responseHex })
+            body: JSON.stringify({ raw_hex: responseHex , alarm_threshold: window.g_alarm_threshold})
         });
         return await res.json();
     } catch (err) {
@@ -229,6 +231,7 @@ async function executeSingleRead(hexCmd) {
 export async function gotoHome() {
   window.location.href = "/";
 }
+
 
 
 export async function readSystemInfo() {
@@ -247,6 +250,7 @@ export async function readSystemInfo() {
     const data = await res.json();
 
     if (data.parsed) {
+        g_alarm_threshold = data.parsed.alarm_threshold
         return data
     }
 }
@@ -259,9 +263,12 @@ function generateHexCommand(addr, cmdId, value, valueType = 'int') {
 
     if (valueType === 'float') {
         // Convert JS float to 4-byte IEEE 754 Big Endian
-        const buffer = new ArrayBuffer(4);
-        new DataView(buffer).setFloat32(0, value, false);
-        cmdList.push(...new Uint8Array(buffer));
+        // const buffer = new ArrayBuffer(4);
+        // new DataView(buffer).setFloat32(0, value, false);
+        // cmdList.push(...new Uint8Array(buffer));
+        value = value * 1000;
+        cmdList.push((value >> 8) & 0xFF);
+        cmdList.push(value & 0xFF);
     } else if (valueType === 'int') {
         // 2-byte integer Big Endian
         cmdList.push((value >> 8) & 0xFF);
@@ -307,6 +314,11 @@ export async function updateSystemSetting(type, inputId) {
             ackKey = "set_network_address_ack";
             break;
         case 'calibration-a':
+            const userSlope = document.getElementById('sys-calibration-a').value;
+            if( userSlope > 10 ){
+                showToast("User Slope set via Coefficient correction should not exceed 10", 'error');
+                return;
+            }
             hexCmd = generateHexCommand(currentNetAddr, 0xCF, parseFloat(inputValue), 'float');
             ackKey = "set_calibration_a_ack";
             break;
@@ -315,7 +327,8 @@ export async function updateSystemSetting(type, inputId) {
             ackKey = "set_calibration_b_ack";
             break;
         case 'correction-value':
-            hexCmd = generateHexCommand(currentNetAddr, 0x9E, parseFloat(inputValue), 'float');
+            const Normalisedinput = inputValue / 1000;
+            hexCmd = generateHexCommand(currentNetAddr, 0x9E, parseFloat(Normalisedinput), 'float');
             ackKey = "set_correction_value_ack";
             break;
         case 'cancel-correction-value':
