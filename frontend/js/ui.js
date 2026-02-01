@@ -25,8 +25,7 @@ export function updateReading(parsed) {
 export function processNewData(parsed) {
     updateReading(parsed);
     updateDustAlert();
-    const timeNow = new Date().toLocaleTimeString();
-    addChartData(timeNow, parsed.dust_concentration);
+    addChartData(parsed.dust_concentration);
 }
 
 export function updateDeviceInfo(parsed) {
@@ -214,15 +213,27 @@ export function initChart() {
 }
 
 // Function to add a single new point to the chart
-export function addChartData(timestamp, value) {
+export function addChartData(value) {
     if (!dustChart) return;
 
+    const timeNow = new Date();
+
+    const formatted_ts = timeNow.toLocaleString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: false
+    }).replace(',', '');
+    
     // Add new data
-    dustChart.data.labels.push(timestamp);
+    dustChart.data.labels.push(formatted_ts);
     dustChart.data.datasets[0].data.push(value);
 
     // Keep only the last 50 points on the screen
-    if (dustChart.data.labels.length > 50) {
+    if (dustChart.data.labels.length > 20) {
         dustChart.data.labels.shift();
         dustChart.data.datasets[0].data.shift();
     }

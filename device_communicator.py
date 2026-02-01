@@ -1,7 +1,5 @@
 import json, os, sys, logging, struct, serial, threading
-import serial.tools.list_ports
-from database import engine
-
+# import serial.tools.list_ports
 
 
 #Gloabal Variable
@@ -28,147 +26,150 @@ def load_config():
 #     ports = serial.tools.list_ports.comports()
 #     return [port.device for port in ports]
 
-def get_serial_connection():
-    """Establish and return a serial connection based on config.
-    """
-    global serial_connection
-    if serial_connection is None or not serial_connection.is_open:
-        #print("Creating fresh connection...")
-        try:
-            ports = serial.tools.list_ports.comports()
-            if len(ports) == 0:
-                #print("K1..")
-                device_status = {"connected": False, "error": "No serial ports found", "port": None}
-                return None
-            elif len(ports) == 1:
-                #print("K2..")
-                port = ports[0].device
-                # #print(f"Using the only available port: {port}")
-                # #print("Manufacturer:", ports[0].manufacturer)
-                # #print("Description:", ports[0].description)
-                # #print("HWID:", ports[0].hwid)
-                # #print("VID:", ports[0].vid)
-                # #print("PID:", ports[0].pid)
-                # #print("Serial Number:", ports[0].serial_number)
-                # #print("Location:", ports[0].location)
-                # #print("Product:", ports[0].product)
-                # #print("Interface:", ports[0].interface)
-                # #print("---------------------------------------------------")
+#Commenting below as Server directly can't interact with Device.
+# def get_serial_connection():
+#     """Establish and return a serial connection based on config.
+#     """
+#     global serial_connection
+#     if serial_connection is None or not serial_connection.is_open:
+#         #print("Creating fresh connection...")
+#         try:
+#             ports = serial.tools.list_ports.comports()
+#             if len(ports) == 0:
+#                 #print("K1..")
+#                 device_status = {"connected": False, "error": "No serial ports found", "port": None}
+#                 return None
+#             elif len(ports) == 1:
+#                 #print("K2..")
+#                 port = ports[0].device
+#                 # #print(f"Using the only available port: {port}")
+#                 # #print("Manufacturer:", ports[0].manufacturer)
+#                 # #print("Description:", ports[0].description)
+#                 # #print("HWID:", ports[0].hwid)
+#                 # #print("VID:", ports[0].vid)
+#                 # #print("PID:", ports[0].pid)
+#                 # #print("Serial Number:", ports[0].serial_number)
+#                 # #print("Location:", ports[0].location)
+#                 # #print("Product:", ports[0].product)
+#                 # #print("Interface:", ports[0].interface)
+#                 # #print("---------------------------------------------------")
             
-            cfg = load_config()
-            # port = cfg.get("serial", {}).get("port", "COM6")
-            baud = cfg.get("serial", {}).get("baudrate", 9600)
-            parity = cfg.get("serial", {}).get("parity", serial.PARITY_NONE)
-            bytesize = cfg.get("serial", {}).get("bytesize", 8)
-            #print("port:", port)
-            serial_connection = serial.Serial(port=port, baudrate=baud, parity=parity, bytesize= bytesize, timeout=1)
-            command_hex = "fa ff ff 98 00 00 90"
-            cmd_bytes = bytes.fromhex(command_hex.replace(" ", ""))
-            btye_write = serial_connection.write(cmd_bytes)
-            #print('byte_write', btye_write)
-            first_byte = serial_connection.read(1)
-            #print('first_byte', first_byte)
-            if first_byte == b'\xFA':
-                #print("First bit received..")
-                device_status = {"connected": True, "error": None, "port": port}
-                return serial_connection
-            else:
-                #print("No First bit received..")
-                serial_connection = None
-                device_status = {"connected": False, "error": "Device Not Connected", "port": None}
-                return None
-        except Exception as e:
-            device_status = {"connected": False, "error": str(e), "port": None}
-            #print('K4..', device_status)
-            return None
+#             cfg = load_config()
+#             # port = cfg.get("serial", {}).get("port", "COM6")
+#             baud = cfg.get("serial", {}).get("baudrate", 9600)
+#             parity = cfg.get("serial", {}).get("parity", serial.PARITY_NONE)
+#             bytesize = cfg.get("serial", {}).get("bytesize", 8)
+#             #print("port:", port)
+#             serial_connection = serial.Serial(port=port, baudrate=baud, parity=parity, bytesize= bytesize, timeout=1)
+#             command_hex = "fa ff ff 98 00 00 90"
+#             cmd_bytes = bytes.fromhex(command_hex.replace(" ", ""))
+#             btye_write = serial_connection.write(cmd_bytes)
+#             #print('byte_write', btye_write)
+#             first_byte = serial_connection.read(1)
+#             #print('first_byte', first_byte)
+#             if first_byte == b'\xFA':
+#                 #print("First bit received..")
+#                 device_status = {"connected": True, "error": None, "port": port}
+#                 return serial_connection
+#             else:
+#                 #print("No First bit received..")
+#                 serial_connection = None
+#                 device_status = {"connected": False, "error": "Device Not Connected", "port": None}
+#                 return None
+#         except Exception as e:
+#             device_status = {"connected": False, "error": str(e), "port": None}
+#             #print('K4..', device_status)
+#             return None
     
-    return serial_connection 
+#     return serial_connection 
 
-def close_serial_port():
-    if serial_connection:
-        serial_connection.close()
-        return {"Status": "Closed"}
-    return {"Status": "Closed"}
+#Commenting below as this will be taken care as part of app Lifespan.
+# def close_serial_port():
+#     if serial_connection:
+#         serial_connection.close()
+#         return {"Status": "Closed"}
+#     return {"Status": "Closed"}
 
-def send_and_receive(command_hex: str) -> str:
-    """Send a hex command (string) to device and return hex response string.
-    """
-    #print("command_hex:", command_hex)
-    # Convert hex string to bytes
-    try:
-        cmd_bytes = bytes.fromhex(command_hex.replace(" ", ""))
-        #print('cmd_bytes --> ', cmd_bytes)
-        if len(cmd_bytes) < 7:
-            raise Exception("Command too short")
-        if len(cmd_bytes) > 7:
-            raise Exception("Command too long")
-        if len(cmd_bytes) != 7:
-            raise Exception("Command should be 7 bytes")
-        if cmd_bytes[0] != 0xFA:
-            raise Exception("Invalid start byte in command")
+#Handling through JS
+# def send_and_receive(command_hex: str) -> str:
+#     """Send a hex command (string) to device and return hex response string.
+#     """
+#     #print("command_hex:", command_hex)
+#     # Convert hex string to bytes
+#     try:
+#         cmd_bytes = bytes.fromhex(command_hex.replace(" ", ""))
+#         #print('cmd_bytes --> ', cmd_bytes)
+#         if len(cmd_bytes) < 7:
+#             raise Exception("Command too short")
+#         if len(cmd_bytes) > 7:
+#             raise Exception("Command too long")
+#         if len(cmd_bytes) != 7:
+#             raise Exception("Command should be 7 bytes")
+#         if cmd_bytes[0] != 0xFA:
+#             raise Exception("Invalid start byte in command")
         
-    except Exception as e:
-        return f"Error: invalid command hex - {str(e)}"
+#     except Exception as e:
+#         return f"Error: invalid command hex - {str(e)}"
 
-    # Can be removed If centralized serial connection logic works.
-    # cfg = load_config()
-    # port = cfg.get("serial", {}).get("port", "COM6")
-    # baud = cfg.get("serial", {}).get("baudrate", 9600)
-    # parity = cfg.get("serial", {}).get("parity", "N")
-    # bytesize = cfg.get("serial", {}).get("bytesize", 8)
+#     # Can be removed If centralized serial connection logic works.
+#     # cfg = load_config()
+#     # port = cfg.get("serial", {}).get("port", "COM6")
+#     # baud = cfg.get("serial", {}).get("baudrate", 9600)
+#     # parity = cfg.get("serial", {}).get("parity", "N")
+#     # bytesize = cfg.get("serial", {}).get("bytesize", 8)
     
-    with serial_lock:
-        ser = get_serial_connection()
-        if ser is not None:
-            ser.reset_input_buffer()
-            ser.reset_output_buffer()
-        else:
-            return {"error":"No connection Established"}
-        try:
-            # #print("ser.port:", ser.port)
-            # #print("ser.baudrate:", ser.baudrate)
-            # #print("ser.parity:", ser.parity)
-            # #print("ser.bytesize:", ser.bytesize)
-            # #print("ser.timeout:", ser.timeout)
-            # #print("Sending command...")
+#     with serial_lock:
+#         ser = get_serial_connection()
+#         if ser is not None:
+#             ser.reset_input_buffer()
+#             ser.reset_output_buffer()
+#         else:
+#             return {"error":"No connection Established"}
+#         try:
+#             # #print("ser.port:", ser.port)
+#             # #print("ser.baudrate:", ser.baudrate)
+#             # #print("ser.parity:", ser.parity)
+#             # #print("ser.bytesize:", ser.bytesize)
+#             # #print("ser.timeout:", ser.timeout)
+#             # #print("Sending command...")
 
-            # #print("First byte even before reading:",ser.read(1))  
+#             # #print("First byte even before reading:",ser.read(1))  
 
-            bytes_sent = ser.write(cmd_bytes)
-            #print("bytes_sent:", bytes_sent)
-            if bytes_sent != len(cmd_bytes): 
-                logging.warning("Sent %d bytes, expected %d", bytes_sent, len(cmd_bytes))   
+#             bytes_sent = ser.write(cmd_bytes)
+#             #print("bytes_sent:", bytes_sent)
+#             if bytes_sent != len(cmd_bytes): 
+#                 logging.warning("Sent %d bytes, expected %d", bytes_sent, len(cmd_bytes))   
             
-            resp = ser.read(1) # read first byte to check the start byte
-            #print("resp first byte:", resp)
-            if not resp: 
-                #print("No response from device")
-                raise Exception("No response from device")
-            if resp != b'\xFA':
-                #print("Invalid start byte in response")
-                raise Exception("Invalid start byte")
+#             resp = ser.read(1) # read first byte to check the start byte
+#             #print("resp first byte:", resp)
+#             if not resp: 
+#                 #print("No response from device")
+#                 raise Exception("No response from device")
+#             if resp != b'\xFA':
+#                 #print("Invalid start byte in response")
+#                 raise Exception("Invalid start byte")
             
-            second_byte = ser.read(1) # Read 2nd byte, indicates number of bytes contained in this packet
-            #print("second_byte:", second_byte)
-            if not second_byte:
-                raise Exception("Incomplete response from device. Second byte missing in response.")
-            resp += second_byte
-            packet_length = int.from_bytes(second_byte, "big") # More reliable but below one is faster
-            # packet_length = second_byte[0]
-            #print("packet_length:", packet_length)
-            resp += ser.read(packet_length - 2) # read the rest of the packet
-            #print("*************resp.hex()************\n", resp.hex())
-            return resp.hex()
-        except Exception as e:
-                    #need to remove this later
-            import traceback
-            error_details = traceback.format_exc()
-            #print(f"DEBUG LOG:\n{error_details}")
-            exc_type, exc_obj, exc_tb = sys.exc_info()
-            fname = exc_tb.tb_frame.f_code.co_filename
-            line_no = exc_tb.tb_lineno
-            #print(f"Error: {exc_type.__name__} in {fname} at line {line_no}: {str(e)}")
-            raise Exception(f"Serial communication error: {str(e)}")
+#             second_byte = ser.read(1) # Read 2nd byte, indicates number of bytes contained in this packet
+#             #print("second_byte:", second_byte)
+#             if not second_byte:
+#                 raise Exception("Incomplete response from device. Second byte missing in response.")
+#             resp += second_byte
+#             packet_length = int.from_bytes(second_byte, "big") # More reliable but below one is faster
+#             # packet_length = second_byte[0]
+#             #print("packet_length:", packet_length)
+#             resp += ser.read(packet_length - 2) # read the rest of the packet
+#             #print("*************resp.hex()************\n", resp.hex())
+#             return resp.hex()
+#         except Exception as e:
+#                     #need to remove this later
+#             import traceback
+#             error_details = traceback.format_exc()
+#             #print(f"DEBUG LOG:\n{error_details}")
+#             exc_type, exc_obj, exc_tb = sys.exc_info()
+#             fname = exc_tb.tb_frame.f_code.co_filename
+#             line_no = exc_tb.tb_lineno
+#             #print(f"Error: {exc_type.__name__} in {fname} at line {line_no}: {str(e)}")
+#             raise Exception(f"Serial communication error: {str(e)}")
 
 
 def decode_response(hexstr: str) -> dict:
@@ -189,7 +190,6 @@ def decode_response(hexstr: str) -> dict:
     cmdId = b[4]
     # #print("****************cmdId****************", cmdId)
     if cmdId == 0xC9:
-        #print("My News---->",engine.url.host) #KIDEL
         if len(b) < 39:
             #print(f"!!! CRITICAL: Received short packet ({len(b)} bytes). Skipping decode.")
             return {"error": "incomplete response for command C9"}

@@ -2,7 +2,8 @@ from sqlalchemy import Column, Integer, Float, DateTime, create_engine, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime, timezone
-import os, sys
+import os, sys , re
+from urllib.parse import quote_plus
 
 # SQLite database file path
 
@@ -31,17 +32,36 @@ def get_db_path():
     print("database.db_path", db_path)
     return db_path
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-print("database.DATABASE_URL", DATABASE_URL)
-# DATABASE_URL = 'Something'
+def get_encoded_url():
+    # url = os.getenv("DATABASE_URL")
+    url = "postgresql://postgres.rujlxnjigobdlodykgmr:Kis#dwansys31@aws-1-ap-south-1.pooler.supabase.com:5432/postgres" #KIDEL
+    if not url:
+        db_path = get_db_path()
+        normalized_path = db_path.replace(os.sep, '/')
+        SQLITE_URL = f"sqlite:///{normalized_path}"
+        return SQLITE_URL
 
-if not DATABASE_URL:
-    db_path = get_db_path()
-    normalized_path = db_path.replace(os.sep, '/')
-    DATABASE_URL = f"sqlite:///{normalized_path}"
-    print("Final Databaseurl: ", DATABASE_URL)
-else:
-    print('DATABASE URL set to', DATABASE_URL)
+    # 1. Fix the postgres prefix for SQLAlchemy 1.4+
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+
+    # 2. Use Regex to find the password and encode it
+    # This regex looks for: protocol://user:PASSWORD@host
+    pattern = r"^(postgresql://.*?):(.*?)@(.*?)$"
+    match = re.match(pattern, url)
+    
+    if match:
+        prefix, password, suffix = match.groups()
+        # Only encode if it's not already encoded (doesn't contain %)
+        if "%" not in password:
+            encoded_password = quote_plus(password)
+            url = f"{prefix}:{encoded_password}@{suffix}"
+            
+    return url
+
+DATABASE_URL = get_encoded_url() #os.environ.get("DATABASE_URL")
+print("Final database.DATABASE_URL", DATABASE_URL)
+# DATABASE_URL = 'Something'
 
 connect_args = {}
 if DATABASE_URL.startswith("sqlite"):
@@ -71,7 +91,8 @@ class DeviceReading(Base):
     __tablename__ = "readings"
     id = Column(Integer, primary_key=True, index=True)
     # timestamp = Column(DateTime, default=datetime.datetime.now(datetime.timezone.utc))
-    timestamp = Column(DateTime(timezone=True), server_default=datetime.now(timezone.utc).isoformat())
+    # timestamp = Column(DateTime(timezone=True), server_default=datetime.now(timezone.utc).isoformat())
+    timestamp = Column(DateTime(timezone=True), server_default=func.now())
     network_address = Column(Integer)
     dust_concentration = Column(Float)
     pcb_temp = Column(Float)
